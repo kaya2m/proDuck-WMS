@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useRef, useState } from 'react';
+import { useRef, useState, useContext } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -29,7 +29,7 @@ import LogoutOutlined from '@ant-design/icons/LogoutOutlined';
 import SettingOutlined from '@ant-design/icons/SettingOutlined';
 import UserOutlined from '@ant-design/icons/UserOutlined';
 import avatar1 from 'assets/images/users/avatar-1.png';
-
+import { AuthContext } from '../../../../../pages/authentication/AuthContext';
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
   return (
@@ -50,7 +50,7 @@ function a11yProps(index) {
 
 export default function Profile() {
   const theme = useTheme();
-
+  const { currentUser } = useContext(AuthContext);
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
   const handleToggle = () => {
@@ -91,7 +91,7 @@ export default function Profile() {
         <Stack direction="row" spacing={1.25} alignItems="center" sx={{ p: 0.5 }}>
           <Avatar alt="profile user" src={avatar1} size="sm" />
           <Typography variant="subtitle1" sx={{ textTransform: 'capitalize' }}>
-            John Doe
+            {currentUser.username}
           </Typography>
         </Stack>
       </ButtonBase>
@@ -124,9 +124,9 @@ export default function Profile() {
                         <Stack direction="row" spacing={1.25} alignItems="center">
                           <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
                           <Stack>
-                            <Typography variant="h6">John Doe</Typography>
+                            <Typography variant="h6">{   + ' ' + currentUser.surname}</Typography>
                             <Typography variant="body2" color="text.secondary">
-                              UI/UX Designer
+                              {currentUser.role}
                             </Typography>
                           </Stack>
                         </Stack>

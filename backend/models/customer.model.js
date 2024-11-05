@@ -13,12 +13,14 @@ const customerSchema = new Schema({
     billingAddress: {
         street: String,
         city: String,
+        district: String,
         postalCode: String,
         country: String
     },
     shippingAddress: {
         street: String,
         city: String,
+        district: String,
         postalCode: String,
         country: String
     },

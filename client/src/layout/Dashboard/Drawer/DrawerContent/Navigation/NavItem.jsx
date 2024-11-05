@@ -22,9 +22,9 @@ export default function NavItem({ item, level }) {
   const openItem = menuMaster.openedItem;
 
   let itemTarget = '_self';
-  if (item.target) {
-    itemTarget = '_blank';
-  }
+  // if (item.target) {
+  //   itemTarget = '_blank';
+  // }
   let listItemProps = { component: forwardRef((props, ref) => <Link ref={ref} {...props} to={item.url} target={itemTarget} />) };
   if (item?.external) {
     listItemProps = { component: 'a', href: item.url, target: itemTarget };
@@ -99,11 +99,11 @@ export default function NavItem({ item, level }) {
             }),
             ...(!drawerOpen &&
               isSelected && {
-                bgcolor: 'primary.lighter',
-                '&:hover': {
-                  bgcolor: 'primary.lighter'
-                }
-              })
+              bgcolor: 'primary.lighter',
+              '&:hover': {
+                bgcolor: 'primary.lighter'
+              }
+            })
           }}
         >
           {itemIcon}

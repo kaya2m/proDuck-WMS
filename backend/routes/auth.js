@@ -49,7 +49,7 @@ router.post('/login', loginValidationRules(), validate, async (req, res) => {
         }
 
         const token = jwt.sign(
-            { userId: user._id, username: user.username, role: user.role },
+            { userId: user._id, username: user.username, role: user.role, userEmail: user.email },
             JWT_SECRET,
             { expiresIn: '1h' }
         );
@@ -57,7 +57,7 @@ router.post('/login', loginValidationRules(), validate, async (req, res) => {
         res.cookie('token', token, { httpOnly: true, maxAge: 3600000, secure: true });
         res.json({
             message: 'Giriş başarılı.',
-            user: { userId: user._id, username: user.username, role: user.role }
+            user: { userId: user._id, username: user.username, role: user.role, name: user.name, surname: user.surname }
         });
     } catch (err) {
         console.error(err);
@@ -66,7 +66,6 @@ router.post('/login', loginValidationRules(), validate, async (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
-    console.log('logout');
     try {
         res.clearCookie('token');
         res.json({ message: 'Çıkış yapıldı.' });

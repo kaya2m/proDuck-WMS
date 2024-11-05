@@ -5,10 +5,9 @@ import { Link } from 'react-router-dom';
 import { ButtonBase } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import Chip from '@mui/material/Chip';
-
 // project import
-import Logo from './LogoMain';
 import config from 'config';
+import logo from '../../assets/images/icons/produck-logo.png';
 
 // ==============================|| MAIN LOGO ||============================== //
 
@@ -16,7 +15,8 @@ const LogoSection = ({ sx, to }) => {
   return (
     <ButtonBase disableRipple component={Link} to={!to ? config.defaultPath : to} sx={sx}>
       <Stack direction="row" spacing={1} alignItems="center">
-        <Logo />
+        <img src={logo} alt="Logo" width="56" />
+        <Chip label="Produck" variant="outlined" color="primary" sx={{ border: 0, fontSize: '1.3rem', '& .MuiChip-label': { px: 0.5 } }} />
         <Chip
           label={import.meta.env.VITE_APP_VERSION}
           variant="outlined"
