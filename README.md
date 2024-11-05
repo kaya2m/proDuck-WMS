@@ -1,5 +1,4 @@
 # proDuck-WMS
-<<<<<<< HEAD
 
 proDuck-WMS (Warehouse Management System) is a full-stack warehouse management application built with the MERN stack (MongoDB, Express.js, React, and Node.js) to streamline inventory control, optimize workflow efficiency, and manage logistics processes in real-time. This application offers modular functionality and an API-first design, enabling easy integration with other systems like ERP and CRM.
 
