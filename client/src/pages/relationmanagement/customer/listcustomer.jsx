@@ -122,7 +122,7 @@ export default function Customer() {
         <Table columns={columns} dataSource={filteredData} onChange={(pagination, filters, sorter, extra) => {}} />
       </Space>
 
-      <Modal title="Create New Customer" visible={isModalVisible} footer={null} onCancel={handleModalClose}>
+      <Modal title="Create New Customer" open={isModalVisible} footer={null} onCancel={handleModalClose}>
         <CreateCustomer visible={isModalVisible} onClose={handleModalClose} onSave={handleSaveCustomer} />
       </Modal>
     </MainCard>

@@ -1,16 +1,73 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Input, InputNumber, Select, Button, Form, Tooltip } from 'antd';
+import { Input, Select, Button, Form } from 'antd';
+import request from '../../../api/apiRequest';
 
 export default function Create({ onSave, onCancel }) {
+  const [countries, setCountries] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [districts, setDistricts] = useState([]);
+
   const {
     handleSubmit,
     control,
-    formState: { errors }
+    formState: { errors },
+    setValue
   } = useForm();
 
+  const currencyTypes = [
+    { value: 'TRY', label: 'TRY' },
+    { value: 'USD', label: 'USD' },
+    { value: 'EUR', label: 'EUR' },
+    { value: 'GBP', label: 'GBP' },
+    { value: 'JPY', label: 'JPY' }
+  ];
+
+  const paymentMethods = [
+    { value: 'Credit Card', label: 'Credit Card' },
+    { value: 'Cash', label: 'Cash' },
+    { value: 'Bank Transfer', label: 'Bank Transfer' },
+    { value: 'Check', label: 'Check' }
+  ];
+
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await request.get('/address/country');
+        setCountries(response.data);
+        // Türkiye'yi varsayılan olarak ayarlama
+        const defaultCountry = response.data.find((country) => country.name === 'Türkiye');
+        if (defaultCountry) {
+          setValue('countryId', defaultCountry.country_id);
+        }
+      } catch (error) {
+        console.error('Ülkeleri getirme hatası:', error);
+      }
+    };
+    fetchCountries();
+  }, [setValue]);
+
+  const handleCountryChange = async (countryId) => {
+    try {
+      const response = await request.get(`/address/city?countryId=${countryId}`);
+      setCities(response.data);
+      setDistricts([]);
+    } catch (error) {
+      console.error('Şehirleri getirme hatası:', error);
+    }
+  };
+
+  const handleCityChange = async (cityId) => {
+    try {
+      const response = await request.get(`/address/district/${cityId}`);
+      setDistricts(response.data);
+    } catch (error) {
+      console.error('İlçeleri getirme hatası:', error);
+    }
+  };
+
   const onSubmit = (data) => {
-    onSave(data); // Form verilerini kaydetme işlemi
+    onSave(data);
   };
 
   return (
@@ -50,24 +107,75 @@ export default function Create({ onSave, onCancel }) {
         </Form.Item>
 
         {/* Country */}
-        {/* <Form.Item label="Country" validateStatus={errors.countryId && 'error'} help={errors.countryId && 'Country is required'}>
+        <Form.Item label="Country" validateStatus={errors.countryId && 'error'} help={errors.countryId && 'Country is required'}>
           <Controller
             name="countryId"
             control={control}
             rules={{ required: true }}
-            render={({ field }) => <Select {...field} placeholder="Select Country" options={countries} />}
+            render={({ field }) => (
+              <Select
+                {...field}
+                placeholder="Select Country"
+                options={countries.map((country) => ({
+                  value: country.country_id,
+                  label: country.name
+                }))}
+                showSearch
+                optionFilterProp="label"
+                onChange={(value) => {
+                  field.onChange(value);
+                  handleCountryChange(value);
+                }}
+              />
+            )}
           />
-        </Form.Item> */}
+        </Form.Item>
+
+        {/* City */}
+        <Form.Item label="City" validateStatus={errors.cityId && 'error'} help={errors.cityId && 'City is required'}>
+          <Controller
+            name="cityId"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                placeholder="Select City"
+                options={cities.map((city) => ({
+                  value: city.sehir_id,
+                  label: city.sehir_adi
+                }))}
+                showSearch
+                optionFilterProp="label"
+                onChange={(value) => {
+                  field.onChange(value);
+                  handleCityChange(value);
+                }}
+              />
+            )}
+          />
+        </Form.Item>
 
         {/* District */}
-        {/* <Form.Item label="District" validateStatus={errors.districtId && 'error'} help={errors.districtId && 'District is required'}>
+        <Form.Item label="District" validateStatus={errors.districtId && 'error'} help={errors.districtId && 'District is required'}>
           <Controller
             name="districtId"
             control={control}
             rules={{ required: true }}
-            render={({ field }) => <Select {...field} placeholder="Select District" options={districts} />}
+            render={({ field }) => (
+              <Select
+                {...field}
+                placeholder="Select District"
+                options={districts.map((district) => ({
+                  value: district.ilce_id,
+                  label: district.ilce_adi
+                }))}
+                showSearch
+                optionFilterProp="label"
+              />
+            )}
           />
-        </Form.Item> */}
+        </Form.Item>
 
         {/* Address */}
         <Form.Item label="Address" validateStatus={errors.address && 'error'} help={errors.address && 'Address is required'}>
@@ -85,7 +193,7 @@ export default function Create({ onSave, onCancel }) {
         </Form.Item>
 
         {/* Payment Method */}
-        {/* <Form.Item
+        <Form.Item
           label="Payment Method"
           validateStatus={errors.paymentMethod && 'error'}
           help={errors.paymentMethod && 'Payment Method is required'}
@@ -96,7 +204,7 @@ export default function Create({ onSave, onCancel }) {
             rules={{ required: true }}
             render={({ field }) => <Select {...field} placeholder="Select Payment Method" options={paymentMethods} />}
           />
-        </Form.Item> */}
+        </Form.Item>
 
         {/* Short Name */}
         <Form.Item label="Short Name" validateStatus={errors.name && 'error'} help={errors.name && 'Short Name is required'}>
@@ -108,18 +216,8 @@ export default function Create({ onSave, onCancel }) {
           <Controller name="contactNumber2" control={control} render={({ field }) => <Input placeholder="(553) 123-4356" {...field} />} />
         </Form.Item>
 
-        {/* City */}
-        {/* <Form.Item label="City" validateStatus={errors.cityId && 'error'} help={errors.cityId && 'City is required'}>
-          <Controller
-            name="cityId"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => <Select {...field} placeholder="Select City" options={cities} />}
-          />
-        </Form.Item> */}
-
         {/* Currency Type */}
-        {/* <Form.Item
+        <Form.Item
           label="Currency Type"
           validateStatus={errors.currencyType && 'error'}
           help={errors.currencyType && 'Currency Type is required'}
@@ -130,7 +228,7 @@ export default function Create({ onSave, onCancel }) {
             rules={{ required: true }}
             render={({ field }) => <Select {...field} placeholder="Select Currency Type" options={currencyTypes} />}
           />
-        </Form.Item> */}
+        </Form.Item>
 
         {/* Notes */}
         <Form.Item label="Notes">
