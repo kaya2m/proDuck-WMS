@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Input, Select, Button, Form } from 'antd';
+import { Input, Select, Button, Form, Card, Typography } from 'antd';
 import request from '../../../api/apiRequest';
+import './createcustomer.css';
+import { ArrowLeftOutlined, LinkedinOutlined, GlobalOutlined } from '@ant-design/icons';
+import { errorAlert, successAlert, confirmAlert } from '../../../common/sweatAlertConfig';
+import toastify from '../../../common/toastifyConfig';
 
 export default function Create({ onSave, onCancel }) {
   const [countries, setCountries] = useState([]);
@@ -23,11 +27,29 @@ export default function Create({ onSave, onCancel }) {
     { value: 'JPY', label: 'JPY' }
   ];
 
-  const paymentMethods = [
-    { value: 'Credit Card', label: 'Credit Card' },
-    { value: 'Cash', label: 'Cash' },
-    { value: 'Bank Transfer', label: 'Bank Transfer' },
-    { value: 'Check', label: 'Check' }
+  const paymentMethods = [{ value: 'Kredi Kartı' }, { value: 'Nakit' }, { value: 'Havale' }, { value: 'Çek' }];
+
+  const sectors = [
+    { name: 'Tarım, Ormancılık ve Balıkçılık' },
+    { name: 'Madencilik ve Taş Ocakçılığı' },
+    { name: 'İmalat' },
+    { name: 'Elektrik, Gaz, Buhar ve İklimlendirme Üretimi ve Dağıtımı' },
+    { name: 'Su Temini; Kanalizasyon, Atık Yönetimi ve İyileştirme Faaliyetleri' },
+    { name: 'İnşaat' },
+    { name: 'Toptan ve Perakende Ticaret' },
+    { name: 'Motorlu Kara Taşıtlarının ve Motosikletlerin Onarımı' },
+    { name: 'Ulaştırma ve Depolama' },
+    { name: 'Konaklama ve Yiyecek Hizmeti Faaliyetleri' },
+    { name: 'Bilgi ve İletişim' },
+    { name: 'Finans ve Sigorta Faaliyetleri' },
+    { name: 'Gayrimenkul Faaliyetleri' },
+    { name: 'Mesleki, Bilimsel ve Teknik Faaliyetler' },
+    { name: 'İdari ve Destek Hizmet Faaliyetleri' },
+    { name: 'Kamu Yönetimi ve Savunma; Zorunlu Sosyal Güvenlik' },
+    { name: 'Eğitim' },
+    { name: 'İnsan Sağlığı ve Sosyal Hizmet Faaliyetleri' },
+    { name: 'Kültür, Sanat, Eğlence, Dinlence ve Spor' },
+    { name: 'Diğer Hizmet Faaliyetleri' }
   ];
 
   useEffect(() => {
@@ -35,7 +57,6 @@ export default function Create({ onSave, onCancel }) {
       try {
         const response = await request.get('/address/country');
         setCountries(response.data);
-        // Türkiye'yi varsayılan olarak ayarlama
         const defaultCountry = response.data.find((country) => country.name === 'Türkiye');
         if (defaultCountry) {
           setValue('countryId', defaultCountry.country_id);
@@ -66,185 +87,409 @@ export default function Create({ onSave, onCancel }) {
     }
   };
 
-  const onSubmit = (data) => {
-    onSave(data);
+  const onSubmit = async (data) => {
+    try {
+      const isConfirmed = await confirmAlert('Yeni Müşteri Tanımalama', 'Müşteri oluşturulacak, onaylıyor musunuz?');
+      if (isConfirmed) {
+        const response = await request.post('/customer', data);
+        if (response.status === 201) {
+          toastify.successToast('Müşteri başarıyla oluşturuldu');
+          onSave(response.data);
+        } else {
+          console.error('Müşteri kaydedilemedi:', response.statusText);
+        }
+      }
+    } catch (error) {
+      toastify.errorToast(error.response.data.message);
+      console.error('Müşteri kaydedilirken hata oluştu:', error);
+    }
   };
 
   return (
-    <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
-      <div className="form-grid">
-        {/* Company Name */}
-        <Form.Item
-          label="Company Name"
-          validateStatus={errors.companyName && 'error'}
-          help={errors.companyName && 'Company Name is required'}
-        >
-          <Controller name="companyName" control={control} rules={{ required: true }} render={({ field }) => <Input {...field} />} />
-        </Form.Item>
+    <div className="customer-form-wrapper">
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px' }}>
+        <Button icon={<ArrowLeftOutlined />} onClick={onCancel} style={{ marginRight: '16px' }} />
+        <Typography>Yeni Müşteri Oluştur</Typography>
+      </div>
 
-        {/* Contact Number */}
-        <Form.Item
-          label="Contact Number"
-          validateStatus={errors.contactNumber && 'error'}
-          help={errors.contactNumber && 'Contact Number is required'}
-        >
-          <Controller
-            name="contactNumber"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => <Input placeholder="(553) 123-4356" {...field} />}
-          />
-        </Form.Item>
+      <Form layout="vertical" onFinish={handleSubmit(onSubmit)} className="customer-form">
+        <div className="form-container">
+          <div className="form-section">
+            <Typography className="section-title">Temel Bilgiler</Typography>
+            <div className="form-fields">
+              {/* Company Name */}
+              <Form.Item
+                label="Firma Adı"
+                validateStatus={errors.companyName && 'error'}
+                help={errors.companyName && 'Firma adı zorunludur'}
+              >
+                <Controller name="companyName" control={control} rules={{ required: true }} render={({ field }) => <Input {...field} />} />
+              </Form.Item>
 
-        {/* Email */}
-        <Form.Item label="Email" validateStatus={errors.email && 'error'} help={errors.email && 'Valid Email is required'}>
-          <Controller
-            name="email"
-            control={control}
-            rules={{ required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ }}
-            render={({ field }) => <Input {...field} />}
-          />
-        </Form.Item>
+              {/* Short Name */}
+              <Form.Item label="Kısa Ad" validateStatus={errors.name && 'error'} help={errors.name && 'Kısa ad zorunludur'}>
+                <Controller name="name" control={control} render={({ field }) => <Input {...field} />} />
+              </Form.Item>
 
-        {/* Country */}
-        <Form.Item label="Country" validateStatus={errors.countryId && 'error'} help={errors.countryId && 'Country is required'}>
-          <Controller
-            name="countryId"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <Select
-                {...field}
-                placeholder="Select Country"
-                options={countries.map((country) => ({
-                  value: country.country_id,
-                  label: country.name
-                }))}
-                showSearch
-                optionFilterProp="label"
-                onChange={(value) => {
-                  field.onChange(value);
-                  handleCountryChange(value);
-                }}
-              />
-            )}
-          />
-        </Form.Item>
+              <Form.Item label="Sektör" validateStatus={errors.sector && 'error'} help={errors.sector && 'Sektör zorunludur'}>
+                <Controller
+                  name="sector"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      placeholder="Sektör Seçiniz"
+                      options={sectors.map((sector) => ({
+                        value: sector.name,
+                        label: sector.name
+                      }))}
+                      showSearch
+                      optionFilterProp="label"
+                      onChange={(value) => {
+                        field.onChange(value);
+                      }}
+                    />
+                  )}
+                />
+              </Form.Item>
 
-        {/* City */}
-        <Form.Item label="City" validateStatus={errors.cityId && 'error'} help={errors.cityId && 'City is required'}>
-          <Controller
-            name="cityId"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <Select
-                {...field}
-                placeholder="Select City"
-                options={cities.map((city) => ({
-                  value: city.sehir_id,
-                  label: city.sehir_adi
-                }))}
-                showSearch
-                optionFilterProp="label"
-                onChange={(value) => {
-                  field.onChange(value);
-                  handleCityChange(value);
-                }}
-              />
-            )}
-          />
-        </Form.Item>
+              {/* Tax Number */}
+              <Form.Item
+                label="Vergi Numarası"
+                validateStatus={errors.taxNumber && 'error'}
+                help={errors.taxNumber && 'Vergi numarası zorunludur'}
+              >
+                <Controller name="taxNumber" control={control} render={({ field }) => <Input {...field} />} />
+              </Form.Item>
 
-        {/* District */}
-        <Form.Item label="District" validateStatus={errors.districtId && 'error'} help={errors.districtId && 'District is required'}>
-          <Controller
-            name="districtId"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <Select
-                {...field}
-                placeholder="Select District"
-                options={districts.map((district) => ({
-                  value: district.ilce_id,
-                  label: district.ilce_adi
-                }))}
-                showSearch
-                optionFilterProp="label"
-              />
-            )}
-          />
-        </Form.Item>
+              <Form.Item label="Vergi Dairesi">
+                <Controller name="taxOffice" control={control} render={({ field }) => <Input {...field} />} />
+              </Form.Item>
+            </div>
 
-        {/* Address */}
-        <Form.Item label="Address" validateStatus={errors.address && 'error'} help={errors.address && 'Address is required'}>
-          <Controller name="address" control={control} rules={{ required: true }} render={({ field }) => <Input.TextArea {...field} />} />
-        </Form.Item>
+            <Typography level={5} className="section-title mt-4">
+              İletişim Bilgileri
+            </Typography>
+            <div className="form-fields">
+              {/* Contact Numbers */}
+              <Form.Item
+                label="Telefon Numarası"
+                validateStatus={errors.contactNumber && 'error'}
+                help={errors.contactNumber && 'Telefon numarası zorunludur'}
+              >
+                <Controller
+                  name="contact.phone"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => <Input placeholder="(553) 123-4356" {...field} />}
+                />
+              </Form.Item>
 
-        {/* Post Code */}
-        <Form.Item label="Post Code" validateStatus={errors.postCode && 'error'} help={errors.postCode && 'Post Code is required'}>
-          <Controller name="postCode" control={control} rules={{ required: true }} render={({ field }) => <Input {...field} />} />
-        </Form.Item>
+              <Form.Item label="İkinci Telefon Numarası">
+                <Controller
+                  name="contact.phone2"
+                  control={control}
+                  render={({ field }) => <Input placeholder="(553) 123-4356" {...field} />}
+                />
+              </Form.Item>
 
-        {/* Tax Number */}
-        <Form.Item label="Tax Number" validateStatus={errors.taxNumber && 'error'} help={errors.taxNumber && 'Tax Number is required'}>
-          <Controller name="taxNumber" control={control} rules={{ required: true }} render={({ field }) => <Input {...field} />} />
-        </Form.Item>
+              {/* Email */}
+              <Form.Item
+                label="E-posta"
+                validateStatus={errors.email && 'error'}
+                help={errors.email && 'Geçerli bir e-posta adresi giriniz'}
+              >
+                <Controller
+                  name="contact.email"
+                  control={control}
+                  rules={{ required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ }}
+                  render={({ field }) => <Input {...field} />}
+                />
+              </Form.Item>
 
-        {/* Payment Method */}
-        <Form.Item
-          label="Payment Method"
-          validateStatus={errors.paymentMethod && 'error'}
-          help={errors.paymentMethod && 'Payment Method is required'}
-        >
-          <Controller
-            name="paymentMethod"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => <Select {...field} placeholder="Select Payment Method" options={paymentMethods} />}
-          />
-        </Form.Item>
+              <Form.Item
+                label="İkinci E-posta"
+                validateStatus={errors.email && 'error'}
+                help={errors.email && 'Geçerli bir e-posta adresi giriniz'}
+              >
+                <Controller
+                  name="contact.email2"
+                  control={control}
+                  rules={{ pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ }}
+                  render={({ field }) => <Input {...field} />}
+                />
+              </Form.Item>
 
-        {/* Short Name */}
-        <Form.Item label="Short Name" validateStatus={errors.name && 'error'} help={errors.name && 'Short Name is required'}>
-          <Controller name="name" control={control} rules={{ required: true }} render={({ field }) => <Input {...field} />} />
-        </Form.Item>
+              {/* Web Sitesi */}
+              <Form.Item label="Web Sitesi" validateStatus={errors.website && 'error'} help={errors.website && 'Geçerli bir URL giriniz'}>
+                <Controller
+                  name="website"
+                  control={control}
+                  rules={{
+                    pattern: {
+                      value: /^(https?:\/\/)?([\w-]+(\.[\w-]+)+)(\/[\w-]*)*\/?$/,
+                      message: 'Geçerli bir URL giriniz'
+                    }
+                  }}
+                  render={({ field }) => <Input {...field} placeholder="https://www.example.com" prefix={<GlobalOutlined />} />}
+                />
+              </Form.Item>
 
-        {/* Contact Number 2 */}
-        <Form.Item label="Contact Number 2">
-          <Controller name="contactNumber2" control={control} render={({ field }) => <Input placeholder="(553) 123-4356" {...field} />} />
-        </Form.Item>
+              {/* LinkedIn */}
+              <Form.Item
+                label="LinkedIn"
+                validateStatus={errors.linkedin && 'error'}
+                help={errors.linkedin && 'Geçerli bir LinkedIn profili giriniz'}
+              >
+                <Controller
+                  name="linkedin"
+                  control={control}
+                  rules={{
+                    pattern: {
+                      value: /^(https?:\/\/)?(www\.)?linkedin\.com\/.*$/,
+                      message: 'Geçerli bir LinkedIn profili giriniz'
+                    }
+                  }}
+                  render={({ field }) => <Input {...field} placeholder="https://www.linkedin.com/..." prefix={<LinkedinOutlined />} />}
+                />
+              </Form.Item>
+            </div>
 
-        {/* Currency Type */}
-        <Form.Item
-          label="Currency Type"
-          validateStatus={errors.currencyType && 'error'}
-          help={errors.currencyType && 'Currency Type is required'}
-        >
-          <Controller
-            name="currencyType"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => <Select {...field} placeholder="Select Currency Type" options={currencyTypes} />}
-          />
-        </Form.Item>
+            <Typography level={5} className="section-title mt-4">
+              Ek Bilgiler
+            </Typography>
+            <div className="form-fields">
+              {/* Notes */}
+              <Form.Item label="Notlar">
+                <Controller name="notes" control={control} render={({ field }) => <Input.TextArea {...field} rows={4} />} />
+              </Form.Item>
+            </div>
+          </div>
 
-        {/* Notes */}
-        <Form.Item label="Notes">
-          <Controller name="notes" control={control} render={({ field }) => <Input.TextArea {...field} />} />
-        </Form.Item>
+          <div className="form-section">
+            <Typography level={5} className="section-title">
+              Gönderi Adresi Bilgileri
+            </Typography>
+            <div className="form-fields">
+              {/* Address Fields */}
+              <Form.Item label="Ülke" validateStatus={errors.countryId && 'error'} help={errors.countryId && 'Ülke seçimi zorunludur'}>
+                <Controller
+                  name="shippingAddress.countryId"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      placeholder="Ülke Seçiniz"
+                      options={countries.map((country) => ({
+                        value: country.country_id,
+                        label: country.name
+                      }))}
+                      showSearch
+                      optionFilterProp="label"
+                      onChange={(value) => {
+                        field.onChange(value);
+                        handleCountryChange(value);
+                      }}
+                    />
+                  )}
+                />
+              </Form.Item>
+
+              {/* City */}
+              <Form.Item label="İl" validateStatus={errors.cityId && 'error'} help={errors.cityId && 'City is required'}>
+                <Controller
+                  name="shippingAddress.cityId"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      placeholder="İl Seçiniz"
+                      options={cities.map((city) => ({
+                        value: city.sehir_id,
+                        label: city.sehir_adi
+                      }))}
+                      showSearch
+                      optionFilterProp="label"
+                      onChange={(value) => {
+                        field.onChange(value);
+                        handleCityChange(value);
+                      }}
+                    />
+                  )}
+                />
+              </Form.Item>
+
+              {/* District */}
+              <Form.Item label="İlçe" validateStatus={errors.districtId && 'error'} help={errors.districtId && 'District is required'}>
+                <Controller
+                  name="shippingAddress.districtId"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      placeholder="İlçe Seçiniz"
+                      options={districts.map((district) => ({
+                        value: district.ilce_id,
+                        label: district.ilce_adi
+                      }))}
+                      showSearch
+                      optionFilterProp="label"
+                    />
+                  )}
+                />
+              </Form.Item>
+              <Form.Item label="Posta Kodu">
+                <Controller name="shippingAddress.postalCode" control={control} render={({ field }) => <Input {...field} />} />
+              </Form.Item>
+              <Form.Item label="Address">
+                <Controller
+                  name="shippingAddress.address"
+                  control={control}
+                  render={({ field }) => <Input.TextArea {...field} rows={4} />}
+                />
+              </Form.Item>
+            </div>
+
+            <Typography level={5} className="section-title mt-4">
+              Finansal Bilgiler
+            </Typography>
+            <div className="form-fields">
+              {/* Payment Method */}
+              <Form.Item
+                label="Ödeme Yöntemi"
+                validateStatus={errors.paymentMethod && 'error'}
+                help={errors.paymentMethod && 'Ödeme yöntemi zorunludur'}
+              >
+                <Controller
+                  name="paymentMethod"
+                  control={control}
+                  render={({ field }) => <Select {...field} placeholder="Ödeme Yöntemi Seçiniz" options={paymentMethods} />}
+                />
+              </Form.Item>
+
+              {/* Currency Type */}
+              <Form.Item
+                label="Para Birimi"
+                validateStatus={errors.currencyType && 'error'}
+                help={errors.currencyType && 'Para birimi zorunludur'}
+              >
+                <Controller
+                  name="currencyType"
+                  control={control}
+                  render={({ field }) => <Select {...field} placeholder="Para Birimi Seçiniz" options={currencyTypes} />}
+                />
+
+                {/* Address Fields */}
+                <Form.Item
+                  label="Ülke"
+                  className="mt-2"
+                  validateStatus={errors.countryId && 'error'}
+                  help={errors.countryId && 'Ülke seçimi zorunludur'}
+                >
+                  <Controller
+                    name="billingAddress.countryId"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        placeholder="Ülke Seçiniz"
+                        options={countries.map((country) => ({
+                          value: country.country_id,
+                          label: country.name
+                        }))}
+                        showSearch
+                        optionFilterProp="label"
+                        onChange={(value) => {
+                          field.onChange(value);
+                          handleCountryChange(value);
+                        }}
+                      />
+                    )}
+                  />
+                </Form.Item>
+
+                {/* City */}
+                <Form.Item label="İl" className="mt-2" validateStatus={errors.cityId && 'error'} help={errors.cityId && 'City is required'}>
+                  <Controller
+                    name="billingAddress.cityId"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        placeholder="İl Seçiniz"
+                        options={cities.map((city) => ({
+                          value: city.sehir_id,
+                          label: city.sehir_adi
+                        }))}
+                        showSearch
+                        optionFilterProp="label"
+                        onChange={(value) => {
+                          field.onChange(value);
+                          handleCityChange(value);
+                        }}
+                      />
+                    )}
+                  />
+                </Form.Item>
+
+                {/* District */}
+                <Form.Item
+                  label="İlçe"
+                  className="mt-2"
+                  validateStatus={errors.districtId && 'error'}
+                  help={errors.districtId && 'District is required'}
+                >
+                  <Controller
+                    name="billingAddress.districtId"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        placeholder="İlçe Seçiniz"
+                        options={districts.map((district) => ({
+                          value: district.ilce_id,
+                          label: district.ilce_adi
+                        }))}
+                        showSearch
+                        optionFilterProp="label"
+                      />
+                    )}
+                  />
+                </Form.Item>
+
+                <Form.Item label="Posta Kodu" className="mt-2">
+                  <Controller name="billingAddress.postalCode" control={control} render={({ field }) => <Input {...field} />} />
+                </Form.Item>
+
+                <Form.Item label="Address" className="mt-2">
+                  <Controller
+                    name="billingAddress.address"
+                    control={control}
+                    render={({ field }) => <Input.TextArea {...field} rows={4} />}
+                  />
+                </Form.Item>
+              </Form.Item>
+            </div>
+          </div>
+        </div>
 
         {/* Action Buttons */}
-        <div style={{ textAlign: 'right' }}>
-          <Button type="primary" htmlType="submit" style={{ marginRight: 8 }}>
-            Save
-          </Button>
+        <div className="form-actions">
           <Button type="default" onClick={onCancel}>
-            Cancel
+            İptal
+          </Button>
+          <Button type="primary" htmlType="submit">
+            Kaydet
           </Button>
         </div>
-      </div>
-    </Form>
+      </Form>
+    </div>
   );
 }

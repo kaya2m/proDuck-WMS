@@ -24,6 +24,7 @@ import { Formik } from 'formik';
 // project import
 import AnimateButton from 'components/@extended/AnimateButton';
 import request from '../../../api/apiRequest';
+import toastifyConfig from '../../../common/toastifyConfig';
 
 // assets
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
@@ -47,18 +48,19 @@ export default function AuthLogin({ isDemo = false }) {
   };
 
   const handleSubmit = async (values, { setErrors, setStatus, setSubmitting }) => {
-
     try {
       const response = await request.post('/auth/login', values);
       if (response.data) {
         setStatus({ success: true });
         setSubmitting(false);
         updateUser(response.data.user);
+        toastifyConfig.successToast('Giriş başarılı');
         navigate('/dashboard/default', { replace: true });
       }
     } catch (error) {
       setErrors({ submit: error.message });
       setSubmitting(false);
+      toastifyConfig.errorToast(error.message);
     }
   };
 

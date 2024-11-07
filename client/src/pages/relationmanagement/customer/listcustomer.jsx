@@ -4,12 +4,13 @@ import { Table, Input, Space, Button, Tooltip, Modal } from 'antd';
 import { SearchOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import request from 'api/apiRequest';
 import CreateCustomer from './createcustomer';
+import toastifyConfig from '../../../common/toastifyConfig';
 
 export default function Customer() {
   const [data, setData] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   useEffect(() => {
     request
@@ -44,6 +45,19 @@ export default function Customer() {
     );
 
     setFilteredData(filtered);
+  };
+
+  const toggleCreateForm = () => {
+    setShowCreateForm(true);
+  };
+
+  const handleCreateFormClose = () => {
+    setShowCreateForm(false);
+  };
+
+  const handleSaveCustomer = (customerData) => {
+    setData([...data, customerData]);
+    setShowCreateForm(false);
   };
 
   const columns = [
@@ -91,40 +105,33 @@ export default function Customer() {
     }
   ];
 
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleSaveCustomer = (customerData) => {
-    setCustomers([...customers, customerData]);
-    setIsModalVisible(false);
-  };
-
   return (
     <MainCard title="Customer List">
-      <Space direction="vertical" style={{ width: '100%' }}>
-        <Space>
-          <Input
-            placeholder="Arama yapın"
-            value={searchText}
-            onChange={handleSearch}
-            prefix={<SearchOutlined style={{ color: 'rgba(0,0,0,.45)' }} />}
-            style={{ marginBottom: 16, width: '200px', height: '40px' }}
-          />
-          <Button type="primary" className="ms-3 mb-3" size="large" onClick={showModal} icon={<PlusCircleOutlined />}>
-            New Customer
-          </Button>
+      {!showCreateForm ? (
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <Space>
+            <Input
+              placeholder="Arama yapın"
+              value={searchText}
+              onChange={handleSearch}
+              prefix={<SearchOutlined style={{ color: 'rgba(0,0,0,.45)' }} />}
+              style={{ marginBottom: 16, width: '200px', height: '40px' }}
+            />
+            <Button type="primary" className="ms-3 mb-3" size="large" onClick={toggleCreateForm} icon={<PlusCircleOutlined />}>
+              New Customer
+            </Button>
+          </Space>
+          <Table columns={columns} dataSource={filteredData} onChange={(pagination, filters, sorter, extra) => {}} />
         </Space>
-        <Table columns={columns} dataSource={filteredData} onChange={(pagination, filters, sorter, extra) => {}} />
-      </Space>
-
-      <Modal title="Create New Customer" open={isModalVisible} footer={null} onCancel={handleModalClose}>
-        <CreateCustomer visible={isModalVisible} onClose={handleModalClose} onSave={handleSaveCustomer} />
-      </Modal>
+      ) : (
+        <CreateCustomer
+          onSave={(data) => {
+            handleSaveCustomer(data);
+            setShowCreateForm(false);
+          }}
+          onCancel={handleCreateFormClose}
+        />
+      )}
     </MainCard>
   );
 }
