@@ -4,7 +4,7 @@ import { Table, Input, Space, Button, Tooltip, Modal } from 'antd';
 import { SearchOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import request from 'api/apiRequest';
 import CreateCustomer from './createcustomer';
-import toastifyConfig from '../../../common/toastifyConfig';
+import './listcustomer.css';
 
 export default function Customer() {
   const [data, setData] = useState([]);
@@ -19,11 +19,19 @@ export default function Customer() {
         const customerData = response.data.map((customer, index) => ({
           key: index + 1,
           customerCode: customer.customerCode,
+          companyName: customer.companyName,
+          taxNumber: customer.taxNumber,
+          taxOffice: customer.taxOffice,
+          idNumber: customer.idNumber,
+          postCode: customer.postCode,
+          notes: customer.notes,
           name: customer.name,
+          sector: customer.sector,
           phone: customer.contact.phone,
           email: customer.contact.email,
-          billingAddress: `${customer.billingAddress.street}, ${customer.billingAddress.city}, ${customer.billingAddress.country}`,
-          shippingAddress: `${customer.shippingAddress.street}, ${customer.shippingAddress.city}, ${customer.shippingAddress.country}`,
+          //address: customer.billingAddress.address,
+          paymentMethod: customer.paymentMethod,
+
           status: customer.status ? 'Active' : 'Inactive'
         }));
         setData(customerData);
@@ -102,6 +110,47 @@ export default function Customer() {
       ],
       onFilter: (value, record) => record.status === value,
       width: '10%'
+    },
+    {
+      title: 'Company Name',
+      dataIndex: 'companyName',
+      width: '20%',
+      sorter: (a, b) => a.companyName.localeCompare(b.companyName)
+    },
+    {
+      title: 'Tax Number',
+      dataIndex: 'taxNumber',
+      width: '15%'
+    },
+    {
+      title: 'Tax Office',
+      dataIndex: 'taxOffice',
+      width: '15%'
+    },
+    {
+      title: 'ID Number',
+      dataIndex: 'idNumber',
+      width: '15%'
+    },
+    {
+      title: 'Post Code',
+      dataIndex: 'postCode',
+      width: '10%'
+    },
+    {
+      title: 'Notes',
+      dataIndex: 'notes',
+      width: '20%'
+    },
+    {
+      title: 'Sector',
+      dataIndex: 'sector',
+      width: '15%'
+    },
+    {
+      title: 'Payment Method',
+      dataIndex: 'paymentMethod',
+      width: '15%'
     }
   ];
 
@@ -121,7 +170,7 @@ export default function Customer() {
               New Customer
             </Button>
           </Space>
-          <Table columns={columns} dataSource={filteredData} onChange={(pagination, filters, sorter, extra) => {}} />
+          <Table columns={columns} scroll={{ x: 2500 }} dataSource={filteredData} onChange={(pagination, filters, sorter, extra) => {}} />
         </Space>
       ) : (
         <CreateCustomer

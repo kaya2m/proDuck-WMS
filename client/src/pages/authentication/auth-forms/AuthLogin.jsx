@@ -30,7 +30,7 @@ import toastifyConfig from '../../../common/toastifyConfig';
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
 import FirebaseSocial from './FirebaseSocial';
-import { AuthContext } from '../AuthContext';
+import { AuthContext } from '../../../utils/AuthUtils/AuthContext';
 
 // ============================|| JWT - LOGIN ||============================ //
 

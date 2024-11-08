@@ -6,7 +6,7 @@ import router from 'routes';
 import ThemeCustomization from 'themes';
 
 import ScrollTop from 'components/ScrollTop';
-import { AuthProvider } from 'pages/authentication/AuthContext';
+import { AuthProvider } from './utils/AuthUtils/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-toastify/dist/ReactToastify.css';
 // ==============================|| APP - THEME, ROUTER, LOCAL ||============================== //

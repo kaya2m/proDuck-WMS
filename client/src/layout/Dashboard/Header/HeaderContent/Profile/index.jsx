@@ -29,7 +29,7 @@ import LogoutOutlined from '@ant-design/icons/LogoutOutlined';
 import SettingOutlined from '@ant-design/icons/SettingOutlined';
 import UserOutlined from '@ant-design/icons/UserOutlined';
 import avatar1 from 'assets/images/users/avatar-1.png';
-import { AuthContext } from '../../../../../pages/authentication/AuthContext';
+import { AuthContext } from '../../../../../utils/AuthUtils/AuthContext';
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
   return (
@@ -124,7 +124,7 @@ export default function Profile() {
                         <Stack direction="row" spacing={1.25} alignItems="center">
                           <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
                           <Stack>
-                            <Typography variant="h6">{   + ' ' + currentUser.surname}</Typography>
+                            <Typography variant="h6">{+' ' + currentUser.surname}</Typography>
                             <Typography variant="body2" color="text.secondary">
                               {currentUser.role}
                             </Typography>

@@ -5,10 +5,9 @@ const validate = require("../middlewares/validate");
 const authenticateToken = require("../middlewares/authenticate");
 const { generateCustomerCode } = require("../common/functions");
 
-
 router.get("/", authenticateToken, async (req, res) => {
   try {
-    const customers = await Customer.find();
+    const customers = await Customer.find()
     res.json(customers);
   } catch (err) {
     console.error(err);

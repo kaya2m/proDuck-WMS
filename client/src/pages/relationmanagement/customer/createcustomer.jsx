@@ -59,7 +59,7 @@ export default function Create({ onSave, onCancel }) {
         setCountries(response.data);
         const defaultCountry = response.data.find((country) => country.name === 'Türkiye');
         if (defaultCountry) {
-          setValue('countryId', defaultCountry.country_id);
+          setValue('countryId', defaultCountry._id);
         }
       } catch (error) {
         console.error('Ülkeleri getirme hatası:', error);
@@ -128,7 +128,7 @@ export default function Create({ onSave, onCancel }) {
 
               {/* Short Name */}
               <Form.Item label="Kısa Ad" validateStatus={errors.name && 'error'} help={errors.name && 'Kısa ad zorunludur'}>
-                <Controller name="name" control={control} render={({ field }) => <Input {...field} />} />
+                <Controller name="name" control={control} rules={{ required: true }} render={({ field }) => <Input {...field} />} />
               </Form.Item>
 
               <Form.Item label="Sektör" validateStatus={errors.sector && 'error'} help={errors.sector && 'Sektör zorunludur'}>
@@ -175,8 +175,8 @@ export default function Create({ onSave, onCancel }) {
               {/* Contact Numbers */}
               <Form.Item
                 label="Telefon Numarası"
-                validateStatus={errors.contactNumber && 'error'}
-                help={errors.contactNumber && 'Telefon numarası zorunludur'}
+                validateStatus={errors.contact?.phone && 'error'}
+                help={errors.contact?.phone && 'Telefon numarası zorunludur'}
               >
                 <Controller
                   name="contact.phone"
@@ -197,8 +197,8 @@ export default function Create({ onSave, onCancel }) {
               {/* Email */}
               <Form.Item
                 label="E-posta"
-                validateStatus={errors.email && 'error'}
-                help={errors.email && 'Geçerli bir e-posta adresi giriniz'}
+                validateStatus={errors.contact?.email && 'error'}
+                help={errors.contact?.email && 'Geçerli bir e-posta adresi giriniz'}
               >
                 <Controller
                   name="contact.email"
@@ -273,7 +273,11 @@ export default function Create({ onSave, onCancel }) {
             </Typography>
             <div className="form-fields">
               {/* Address Fields */}
-              <Form.Item label="Ülke" validateStatus={errors.countryId && 'error'} help={errors.countryId && 'Ülke seçimi zorunludur'}>
+              <Form.Item
+                label="Ülke"
+                validateStatus={errors.shippingAddress?.countryId && 'error'}
+                help={errors.shippingAddress?.countryId && 'Ülke seçimi zorunludur'}
+              >
                 <Controller
                   name="shippingAddress.countryId"
                   control={control}
@@ -283,7 +287,7 @@ export default function Create({ onSave, onCancel }) {
                       {...field}
                       placeholder="Ülke Seçiniz"
                       options={countries.map((country) => ({
-                        value: country.country_id,
+                        value: country._id,
                         label: country.name
                       }))}
                       showSearch
@@ -298,7 +302,11 @@ export default function Create({ onSave, onCancel }) {
               </Form.Item>
 
               {/* City */}
-              <Form.Item label="İl" validateStatus={errors.cityId && 'error'} help={errors.cityId && 'City is required'}>
+              <Form.Item
+                label="İl"
+                validateStatus={errors.shippingAddress?.cityId && 'error'}
+                help={errors.shippingAddress?.cityId && 'İl seçimi zorunludur'}
+              >
                 <Controller
                   name="shippingAddress.cityId"
                   control={control}
@@ -308,14 +316,15 @@ export default function Create({ onSave, onCancel }) {
                       {...field}
                       placeholder="İl Seçiniz"
                       options={cities.map((city) => ({
-                        value: city.sehir_id,
-                        label: city.sehir_adi
+                        value: city._id,
+                        label: city.sehir_adi,
+                        cityId: city.sehir_id
                       }))}
                       showSearch
                       optionFilterProp="label"
-                      onChange={(value) => {
-                        field.onChange(value);
-                        handleCityChange(value);
+                      onChange={(e, { cityId }) => {
+                        field.onChange(e);
+                        handleCityChange(cityId);
                       }}
                     />
                   )}
@@ -323,7 +332,11 @@ export default function Create({ onSave, onCancel }) {
               </Form.Item>
 
               {/* District */}
-              <Form.Item label="İlçe" validateStatus={errors.districtId && 'error'} help={errors.districtId && 'District is required'}>
+              <Form.Item
+                label="İlçe"
+                validateStatus={errors.shippingAddress?.districtId && 'error'}
+                help={errors.shippingAddress?.districtId && 'İlçe seçimi zorunludur'}
+              >
                 <Controller
                   name="shippingAddress.districtId"
                   control={control}
@@ -333,7 +346,7 @@ export default function Create({ onSave, onCancel }) {
                       {...field}
                       placeholder="İlçe Seçiniz"
                       options={districts.map((district) => ({
-                        value: district.ilce_id,
+                        value: district._id,
                         label: district.ilce_adi
                       }))}
                       showSearch
@@ -345,10 +358,15 @@ export default function Create({ onSave, onCancel }) {
               <Form.Item label="Posta Kodu">
                 <Controller name="shippingAddress.postalCode" control={control} render={({ field }) => <Input {...field} />} />
               </Form.Item>
-              <Form.Item label="Address">
+              <Form.Item
+                label="Address"
+                validateStatus={errors.shippingAddress?.address && 'error'}
+                help={errors.shippingAddress?.address && 'Adres zorunludur'}
+              >
                 <Controller
                   name="shippingAddress.address"
                   control={control}
+                  rules={{ required: true }}
                   render={({ field }) => <Input.TextArea {...field} rows={4} />}
                 />
               </Form.Item>
@@ -367,6 +385,7 @@ export default function Create({ onSave, onCancel }) {
                 <Controller
                   name="paymentMethod"
                   control={control}
+                  rules={{ required: true }}
                   render={({ field }) => <Select {...field} placeholder="Ödeme Yöntemi Seçiniz" options={paymentMethods} />}
                 />
               </Form.Item>
@@ -380,6 +399,7 @@ export default function Create({ onSave, onCancel }) {
                 <Controller
                   name="currencyType"
                   control={control}
+                  rules={{ required: true }}
                   render={({ field }) => <Select {...field} placeholder="Para Birimi Seçiniz" options={currencyTypes} />}
                 />
 
@@ -387,8 +407,8 @@ export default function Create({ onSave, onCancel }) {
                 <Form.Item
                   label="Ülke"
                   className="mt-2"
-                  validateStatus={errors.countryId && 'error'}
-                  help={errors.countryId && 'Ülke seçimi zorunludur'}
+                  validateStatus={errors.billingAddress?.countryId && 'error'}
+                  help={errors.billingAddress?.countryId && 'Ülke seçimi zorunludur'}
                 >
                   <Controller
                     name="billingAddress.countryId"
@@ -399,7 +419,7 @@ export default function Create({ onSave, onCancel }) {
                         {...field}
                         placeholder="Ülke Seçiniz"
                         options={countries.map((country) => ({
-                          value: country.country_id,
+                          value: country._id,
                           label: country.name
                         }))}
                         showSearch
@@ -414,7 +434,12 @@ export default function Create({ onSave, onCancel }) {
                 </Form.Item>
 
                 {/* City */}
-                <Form.Item label="İl" className="mt-2" validateStatus={errors.cityId && 'error'} help={errors.cityId && 'City is required'}>
+                <Form.Item
+                  label="İl"
+                  className="mt-2"
+                  validateStatus={errors.billingAddress?.cityId && 'error'}
+                  help={errors.billingAddress?.cityId && 'İl seçimi zorunludur'}
+                >
                   <Controller
                     name="billingAddress.cityId"
                     control={control}
@@ -424,14 +449,15 @@ export default function Create({ onSave, onCancel }) {
                         {...field}
                         placeholder="İl Seçiniz"
                         options={cities.map((city) => ({
-                          value: city.sehir_id,
-                          label: city.sehir_adi
+                          value: city._id,
+                          label: city.sehir_adi,
+                          cityId: city.sehir_id
                         }))}
                         showSearch
                         optionFilterProp="label"
-                        onChange={(value) => {
-                          field.onChange(value);
-                          handleCityChange(value);
+                        onChange={(e, { cityId }) => {
+                          field.onChange(e);
+                          handleCityChange(cityId);
                         }}
                       />
                     )}
@@ -442,8 +468,8 @@ export default function Create({ onSave, onCancel }) {
                 <Form.Item
                   label="İlçe"
                   className="mt-2"
-                  validateStatus={errors.districtId && 'error'}
-                  help={errors.districtId && 'District is required'}
+                  validateStatus={errors.billingAddress?.districtId && 'error'}
+                  help={errors.billingAddress?.districtId && 'İlçe seçimi zorunludur'}
                 >
                   <Controller
                     name="billingAddress.districtId"
@@ -454,7 +480,7 @@ export default function Create({ onSave, onCancel }) {
                         {...field}
                         placeholder="İlçe Seçiniz"
                         options={districts.map((district) => ({
-                          value: district.ilce_id,
+                          value: district._id,
                           label: district.ilce_adi
                         }))}
                         showSearch
@@ -468,7 +494,12 @@ export default function Create({ onSave, onCancel }) {
                   <Controller name="billingAddress.postalCode" control={control} render={({ field }) => <Input {...field} />} />
                 </Form.Item>
 
-                <Form.Item label="Address" className="mt-2">
+                <Form.Item
+                  label="Address"
+                  className="mt-2"
+                  validateStatus={errors.billingAddress?.address && 'error'}
+                  help={errors.billingAddress?.address && 'Adres zorunludur'}
+                >
                   <Controller
                     name="billingAddress.address"
                     control={control}
