@@ -7,7 +7,7 @@ const { generateCustomerCode } = require("../common/functions");
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
-    const customers = await Customer.find()
+    const customers = await Customer.find();
     res.json(customers);
   } catch (err) {
     console.error(err);
@@ -35,7 +35,6 @@ router.post(
   validate,
   async (req, res) => {
     const {
-      customerCode,
       name,
       contact,
       billingAddress,
@@ -48,8 +47,10 @@ router.post(
       notes,
       status,
       sector,
-
       paymentMethod,
+      linkedin,
+      website,
+      currencyType,
     } = req.body;
     try {
       let customer = await Customer.findOne({ "contact.email": contact.email });
@@ -71,6 +72,9 @@ router.post(
         sector,
         paymentMethod,
         status,
+        linkedin,
+        website,
+        currencyType,
       });
       await customer.save();
       res
@@ -101,13 +105,16 @@ router.put(
       idNumber,
       notes,
       status,
+      sector,
+      linkedin,
+      website,
+      currencyType,
     } = req.body;
     try {
       let customer = await Customer.findById(req.params.id);
       if (!customer) {
         return res.status(404).json({ message: "Müşteri bulunamadı." });
       }
-
       customer.name = name;
       customer.contact = contact;
       customer.billingAddress = billingAddress;
@@ -119,6 +126,10 @@ router.put(
       customer.idNumber = idNumber;
       customer.notes = notes;
       customer.status = status;
+      customer.sector = sector;
+      customer.linkedin = linkedin;
+      customer.website = website;
+      customer.currencyType = currencyType;
 
       await customer.save();
       res.json({ message: "Müşteri başarıyla güncellendi.", customer });

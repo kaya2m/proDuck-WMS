@@ -34,6 +34,9 @@ const customerSchema = new Schema(
     paymentMethod: { type: String, trim: true },
     notes: { type: String, trim: true },
     status: { type: Boolean, default: true },
+    currencyType: { type: String, trim: true },
+    linkedin: { type: String, trim: true },
+    website: { type: String, trim: true },
   },
   {
     timestamps: true,

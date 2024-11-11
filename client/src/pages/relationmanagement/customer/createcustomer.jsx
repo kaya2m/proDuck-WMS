@@ -6,6 +6,7 @@ import './createcustomer.css';
 import { ArrowLeftOutlined, LinkedinOutlined, GlobalOutlined } from '@ant-design/icons';
 import { errorAlert, successAlert, confirmAlert } from '../../../common/sweatAlertConfig';
 import toastify from '../../../common/toastifyConfig';
+import constants from '../../../common/constants';
 
 export default function Create({ onSave, onCancel }) {
   const [countries, setCountries] = useState([]);
@@ -18,39 +19,6 @@ export default function Create({ onSave, onCancel }) {
     formState: { errors },
     setValue
   } = useForm();
-
-  const currencyTypes = [
-    { value: 'TRY', label: 'TRY' },
-    { value: 'USD', label: 'USD' },
-    { value: 'EUR', label: 'EUR' },
-    { value: 'GBP', label: 'GBP' },
-    { value: 'JPY', label: 'JPY' }
-  ];
-
-  const paymentMethods = [{ value: 'Kredi Kartı' }, { value: 'Nakit' }, { value: 'Havale' }, { value: 'Çek' }];
-
-  const sectors = [
-    { name: 'Tarım, Ormancılık ve Balıkçılık' },
-    { name: 'Madencilik ve Taş Ocakçılığı' },
-    { name: 'İmalat' },
-    { name: 'Elektrik, Gaz, Buhar ve İklimlendirme Üretimi ve Dağıtımı' },
-    { name: 'Su Temini; Kanalizasyon, Atık Yönetimi ve İyileştirme Faaliyetleri' },
-    { name: 'İnşaat' },
-    { name: 'Toptan ve Perakende Ticaret' },
-    { name: 'Motorlu Kara Taşıtlarının ve Motosikletlerin Onarımı' },
-    { name: 'Ulaştırma ve Depolama' },
-    { name: 'Konaklama ve Yiyecek Hizmeti Faaliyetleri' },
-    { name: 'Bilgi ve İletişim' },
-    { name: 'Finans ve Sigorta Faaliyetleri' },
-    { name: 'Gayrimenkul Faaliyetleri' },
-    { name: 'Mesleki, Bilimsel ve Teknik Faaliyetler' },
-    { name: 'İdari ve Destek Hizmet Faaliyetleri' },
-    { name: 'Kamu Yönetimi ve Savunma; Zorunlu Sosyal Güvenlik' },
-    { name: 'Eğitim' },
-    { name: 'İnsan Sağlığı ve Sosyal Hizmet Faaliyetleri' },
-    { name: 'Kültür, Sanat, Eğlence, Dinlence ve Spor' },
-    { name: 'Diğer Hizmet Faaliyetleri' }
-  ];
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -140,7 +108,7 @@ export default function Create({ onSave, onCancel }) {
                     <Select
                       {...field}
                       placeholder="Sektör Seçiniz"
-                      options={sectors.map((sector) => ({
+                      options={constants.sectors.map((sector) => ({
                         value: sector.name,
                         label: sector.name
                       }))}
@@ -155,16 +123,17 @@ export default function Create({ onSave, onCancel }) {
               </Form.Item>
 
               {/* Tax Number */}
-              <Form.Item
-                label="Vergi Numarası"
-                validateStatus={errors.taxNumber && 'error'}
-                help={errors.taxNumber && 'Vergi numarası zorunludur'}
-              >
+              <Form.Item label="Vergi Numarası" help={errors.taxNumber && 'Vergi numarası zorunludur'}>
                 <Controller name="taxNumber" control={control} render={({ field }) => <Input {...field} />} />
               </Form.Item>
 
               <Form.Item label="Vergi Dairesi">
                 <Controller name="taxOffice" control={control} render={({ field }) => <Input {...field} />} />
+              </Form.Item>
+
+              {/* ID Number */}
+              <Form.Item label="Kimlik Numarası">
+                <Controller name="idNumber" control={control} render={({ field }) => <Input {...field} />} />
               </Form.Item>
             </div>
 
@@ -386,7 +355,7 @@ export default function Create({ onSave, onCancel }) {
                   name="paymentMethod"
                   control={control}
                   rules={{ required: true }}
-                  render={({ field }) => <Select {...field} placeholder="Ödeme Yöntemi Seçiniz" options={paymentMethods} />}
+                  render={({ field }) => <Select {...field} placeholder="Ödeme Yöntemi Seçiniz" options={constants.paymentMethods} />}
                 />
               </Form.Item>
 
@@ -400,7 +369,7 @@ export default function Create({ onSave, onCancel }) {
                   name="currencyType"
                   control={control}
                   rules={{ required: true }}
-                  render={({ field }) => <Select {...field} placeholder="Para Birimi Seçiniz" options={currencyTypes} />}
+                  render={({ field }) => <Select {...field} placeholder="Para Birimi Seçiniz" options={constants.currencyTypes} />}
                 />
 
                 {/* Address Fields */}
