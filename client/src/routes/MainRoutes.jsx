@@ -5,8 +5,8 @@ import ProtectedRoute from './ProtectedRoute';
 
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/index')));
 const Customer = Loadable(lazy(() => import('pages/relationmanagement/customer/listcustomer')));
-const Supplier = Loadable(lazy(() => import('pages/relationmanagement/supplier')));
-const Company = Loadable(lazy(() => import('pages/relationmanagement/company')));
+const Supplier = Loadable(lazy(() => import('pages/relationmanagement/supplier/listSupplier')));
+const Company = Loadable(lazy(() => import('pages/relationmanagement/company/listCompany')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 

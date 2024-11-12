@@ -7,8 +7,10 @@ export default function AddressFields({ control, errors, countryId, cityId, pref
   const [cities, setCities] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [countries, setCountries] = useState([]);
+  const [reqCityId, setCityId] = useState('');
 
   useEffect(() => {
+    setCityId(cityId);
     handleCountry();
     handleCountryChange(countryId);
     handleCityChange(cityId);
@@ -33,10 +35,10 @@ export default function AddressFields({ control, errors, countryId, cityId, pref
     }
   };
 
-  const handleCityChange = async (cityId) => {
-    console.log('response', cityId);
+  const handleCityChange = async (reqCityId) => {
     try {
-      const response = await request.get(`/address/district/${cityId}`);
+      console.log('reqCityId', reqCityId);
+      const response = await request.get(`/address/district/${reqCityId}`);
       setDistricts(response.data);
     } catch (error) {
       console.error('Error fetching districts:', error);
@@ -104,7 +106,7 @@ export default function AddressFields({ control, errors, countryId, cityId, pref
             <Select
               {...field}
               placeholder="Select District"
-              options={districts.map((district) => (console.log('district', district), { value: district._id, label: district.ilce_adi }))}
+              options={districts.map((district) => ({ value: district._id, label: district.ilce_adi }))}
             />
           )}
         />

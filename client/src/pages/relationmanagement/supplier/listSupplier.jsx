@@ -3,11 +3,11 @@ import MainCard from 'components/MainCard';
 import { Table, Input, Space, Button, Modal, Dropdown } from 'antd';
 import { SearchOutlined, PlusCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import request from 'api/apiRequest';
-import CreateCustomer from './createcustomer';
-import EditCustomer from './editCustomer';
-import './listcustomer.css';
+import CreateSupplier from './createSupplier';
+import EditSupplier from './editSupplier';
+import './listSupplier.css';
 
-export default function Customer() {
+export default function Supplier() {
   const [data, setData] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState([]);
@@ -20,42 +20,41 @@ export default function Customer() {
 
   useEffect(() => {
     request
-      .get('/customer/')
+      .get('/suppliers')
       .then((response) => {
-        const customerData = response.data.map((customer, index) => ({
+        const supplierData = response.data.map((supplier, index) => ({
           key: index + 1,
-          _id: customer._id,
-          customerCode: customer.customerCode,
-          companyName: customer.companyName,
-          taxNumber: customer.taxNumber,
-          taxOffice: customer.taxOffice,
-          idNumber: customer.idNumber,
-          postCode: customer.postCode,
-          notes: customer.notes,
-          name: customer.name,
-          sector: customer.sector,
-          phone: customer.contact.phone,
-          email: customer.contact.email,
-          billingAddress: customer.billingAddress?.address,
-          shippingAddress: customer.shippingAddress?.address,
-          paymentMethod: customer.paymentMethod,
-          status: customer.status ? 'Active' : 'Inactive'
+          _id: supplier._id,
+          name: supplier.name,
+          contactPersonName: supplier.contactPerson?.name,
+          contactPersonTitle: supplier.contactPerson?.title,
+          contactPhone: supplier.phone,
+          contactEmail: supplier.email,
+          bankName: supplier.bankDetails?.bankName,
+          iban: supplier.bankDetails?.iban,
+          swiftCode: supplier.bankDetails?.swiftCode,
+          status: supplier.status ? 'Active' : 'Inactive',
+          rating: supplier.rating,
+          paymentMethod: supplier.paymentMethod,
+          deliveryLeadTime: supplier.deliveryLeadTime,
+          sector: supplier.sector,
+          notes: supplier.notes
         }));
-        setData(customerData);
-        setFilteredData(customerData);
+        setData(supplierData);
+        setFilteredData(supplierData);
       })
-      .catch((error) => console.error('Error fetching customers:', error));
+      .catch((error) => console.error('Error fetching suppliers:', error));
   }, []);
 
   const handleSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
     const filtered = data.filter(
-      (customer) =>
-        customer.customerCode.toLowerCase().includes(value) ||
-        customer.name.toLowerCase().includes(value) ||
-        customer.phone.toLowerCase().includes(value) ||
-        customer.email.toLowerCase().includes(value)
+      (supplier) =>
+        supplier.name.toLowerCase().includes(value) ||
+        supplier.contactPhone?.toLowerCase().includes(value) ||
+        supplier.contactEmail?.toLowerCase().includes(value) ||
+        supplier.contactPersonName?.toLowerCase().includes(value)
     );
     setFilteredData(filtered);
   };
@@ -68,8 +67,8 @@ export default function Customer() {
     setShowCreateForm(false);
   };
 
-  const handleSaveCustomer = (customerData) => {
-    setData([...data, customerData]);
+  const handleSaveSupplier = (supplierData) => {
+    setData([...data, supplierData]);
     setShowCreateForm(false);
   };
 
@@ -83,8 +82,8 @@ export default function Customer() {
     setEditRecord(null);
   };
 
-  const handleUpdateCustomer = (updatedData) => {
-    const updatedList = data.map((customer) => (customer.key === updatedData.key ? updatedData : customer));
+  const handleUpdateSupplier = (updatedData) => {
+    const updatedList = data.map((supplier) => (supplier.key === updatedData.key ? updatedData : supplier));
     setData(updatedList);
     setFilteredData(updatedList);
     setEditFormVisible(false);
@@ -93,13 +92,13 @@ export default function Customer() {
   const handleDelete = (record) => {
     Modal.confirm({
       title: 'Silme Onayı',
-      content: 'Bu müşteriyi silmek istediğinizden emin misiniz?',
+      content: 'Bu tedarikçiyi silmek istediğinizden emin misiniz?',
       okText: 'Evet',
       cancelText: 'Hayır',
       onOk: () => {
-        request.delete(`/customer/${record._id}`).then((response) => {
-          setData(data.filter((customer) => customer._id !== record._id));
-          setFilteredData(filteredData.filter((customer) => customer._id !== record._id));
+        request.delete(`/supplier/${record._id}`).then((response) => {
+          setData(data.filter((supplier) => supplier._id !== record._id));
+          setFilteredData(filteredData.filter((supplier) => supplier._id !== record._id));
         });
       }
     });
@@ -122,15 +121,16 @@ export default function Customer() {
   ];
 
   const columns = [
-    { title: 'Müşteri Numarası', dataIndex: 'customerCode', width: '9%', sorter: (a, b) => a.customerCode.localeCompare(b.customerCode) },
-    { title: 'Adı', dataIndex: 'name', filterSearch: true },
-    { title: 'Telefon', dataIndex: 'phone' },
-    { title: 'Email', dataIndex: 'email' },
-    { title: 'Fatura Adresi', dataIndex: 'billingAddress' },
-    { title: 'Gönderi Adresi', dataIndex: 'shippingAddress' },
+    { title: 'Tedarikçi Adı', dataIndex: 'name', width: '15%', sorter: (a, b) => a.name.localeCompare(b.name) },
+    { title: 'Yetkili Kişi', dataIndex: 'contactPersonName' },
+    { title: 'Yetkili Ünvanı', dataIndex: 'contactPersonTitle' },
+    { title: 'Telefon', dataIndex: 'contactPhone' },
+    { title: 'Email', dataIndex: 'contactEmail' },
+    { title: 'Banka Adı', dataIndex: 'bankName' },
+    { title: 'IBAN', dataIndex: 'iban' },
+    { title: 'SWIFT Kodu', dataIndex: 'swiftCode' },
     {
       title: 'Durum',
-
       dataIndex: 'status',
       filters: [
         { text: 'Aktif', value: 'Active' },
@@ -138,14 +138,11 @@ export default function Customer() {
       ],
       onFilter: (value, record) => record.status === value
     },
-    { title: 'Şirket Adı', dataIndex: 'companyName', sorter: (a, b) => a.companyName.localeCompare(b.companyName) },
-    { title: 'Vergi Numarası', dataIndex: 'taxNumber' },
-    { title: 'Vergi Dairesi', dataIndex: 'taxOffice' },
-    { title: 'TC Kimlik Numarası', dataIndex: 'idNumber' },
-    { title: 'Posta Kodu', dataIndex: 'postCode' },
-    { title: 'Notlar', dataIndex: 'notes' },
-    { title: 'Sektör', dataIndex: 'sector' },
-    { title: 'Ödeme Yöntemi', dataIndex: 'paymentMethod' }
+    { title: 'Değerlendirme', dataIndex: 'rating', sorter: (a, b) => a.rating - b.rating },
+    { title: 'Ödeme Koşulları', dataIndex: 'paymentMethod' },
+    { title: 'Teslimat Süresi (gün)', dataIndex: 'deliveryLeadTime' },
+    { title: 'Etiketler', dataIndex: 'tags' },
+    { title: 'Notlar', dataIndex: 'notes' }
   ];
 
   const handleContextMenu = (record, event) => {
@@ -160,7 +157,7 @@ export default function Customer() {
   };
 
   return (
-    <MainCard title="Müşteri Listesi">
+    <MainCard title="Tedarikçi Listesi">
       {!showCreateForm && !editFormVisible ? (
         <Space direction="vertical" style={{ width: '100%' }}>
           <Space>
@@ -172,7 +169,7 @@ export default function Customer() {
               style={{ marginBottom: 16, width: '200px', height: '40px' }}
             />
             <Button type="primary" className="ms-3 mb-3" size="large" onClick={toggleCreateForm} icon={<PlusCircleOutlined />}>
-              Yeni Müşteri
+              Yeni Tedarikçi
             </Button>
           </Space>
           <Table
@@ -201,15 +198,15 @@ export default function Customer() {
           </Dropdown>
         </Space>
       ) : showCreateForm ? (
-        <CreateCustomer
+        <CreateSupplier
           onSave={(data) => {
-            handleSaveCustomer(data);
+            handleSaveSupplier(data);
             setShowCreateForm(false);
           }}
           onCancel={handleCreateFormClose}
         />
       ) : (
-        <EditCustomer customerId={editRecord._id} onSave={handleUpdateCustomer} onCancel={handleEditFormClose} />
+        <EditSupplier supplierId={editRecord._id} onSave={handleUpdateSupplier} onCancel={handleEditFormClose} />
       )}
     </MainCard>
   );
