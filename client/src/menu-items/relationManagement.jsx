@@ -10,7 +10,7 @@ const icons = {
 
 // ==============================|| MENU ITEMS - EXTRA PAGES ||============================== //
 
-const pages = {
+const relationmanagment = {
   id: 'relationmanagment',
   title: 'Business Relations',
   type: 'group',
@@ -30,16 +30,8 @@ const pages = {
       url: '/suppliers',
       icon: icons.ShopOutlined,
       target: true
-    },
-    {
-      id: 'companyManagement',
-      title: 'Şirket Yönetimi',
-      type: 'item',
-      url: '/company',
-      icon: icons.BankOutlined,
-      target: true
-    },
+    }
   ]
 };
 
-export default pages;
+export default relationmanagment;

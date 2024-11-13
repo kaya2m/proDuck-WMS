@@ -1,13 +1,13 @@
 // project import
 import dashboard from './dashboard';
-import pages from './relationmanagment';
-import utilities from './utilities';
-import support from './support';
+import relationmanagment from './relationManagement';
+import warehousemanagement from './warehouseManagement';
+import support from './settingManagement';
 
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems = {
-  items: [dashboard, pages, utilities, support]
+  items: [dashboard, relationmanagment, warehousemanagement, support]
 };
 
 export default menuItems;

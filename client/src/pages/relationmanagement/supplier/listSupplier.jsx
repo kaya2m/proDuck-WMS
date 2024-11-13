@@ -96,7 +96,7 @@ export default function Supplier() {
       okText: 'Evet',
       cancelText: 'Hayır',
       onOk: () => {
-        request.delete(`/supplier/${record._id}`).then((response) => {
+        request.delete(`/suppliers/${record._id}`).then((response) => {
           setData(data.filter((supplier) => supplier._id !== record._id));
           setFilteredData(filteredData.filter((supplier) => supplier._id !== record._id));
         });
