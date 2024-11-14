@@ -9,6 +9,7 @@ import ScrollTop from 'components/ScrollTop';
 import { AuthProvider } from './utils/AuthUtils/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-toastify/dist/ReactToastify.css';
+import './App.css';
 // ==============================|| APP - THEME, ROUTER, LOCAL ||============================== //
 
 export default function App() {

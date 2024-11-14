@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Input, Select, Button, Form, Typography } from 'antd';
 import request from '../../../api/apiRequest';
-import './editCustomer.css';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { confirmAlert } from '../../../common/sweatAlertConfig';
 import toastify from '../../../common/toastifyConfig';

@@ -1,4 +1,4 @@
- const currencyTypes = [
+const currencyTypes = [
   { value: 'TRY', label: 'TRY' },
   { value: 'USD', label: 'USD' },
   { value: 'EUR', label: 'EUR' },
@@ -6,9 +6,9 @@
   { value: 'JPY', label: 'JPY' }
 ];
 
- const paymentMethods = [{ value: 'Kredi Kartı' }, { value: 'Nakit' }, { value: 'Havale' }, { value: 'Çek' }];
+const paymentMethods = [{ value: 'Kredi Kartı' }, { value: 'Nakit' }, { value: 'Havale' }, { value: 'Çek' }];
 
- const sectors = [
+const sectors = [
   { name: 'Tarım, Ormancılık ve Balıkçılık' },
   { name: 'Madencilik ve Taş Ocakçılığı' },
   { name: 'İmalat' },
@@ -30,5 +30,22 @@
   { name: 'Kültür, Sanat, Eğlence, Dinlence ve Spor' },
   { name: 'Diğer Hizmet Faaliyetleri' }
 ];
-
-export default { currencyTypes, paymentMethods, sectors }; 
+const unitOptions = [
+  { label: 'Kilogram' },
+  { label: 'Adet' },
+  { label: 'Gram' },
+  { label: 'Pound' },
+  { label: 'Ounce' },
+  { label: 'Litre' },
+  { label: 'Mililitre' },
+  { label: 'Parça' },
+  { label: 'Kutu' },
+  { label: 'Metrekare' },
+  { label: 'Metreküp' },
+  { label: 'Metre' },
+  { label: 'Santimetre' },
+  { label: 'Milimetre' },
+  { label: 'Santimetrekare' },
+  { label: 'Milimetrekare' }
+];
+export default { currencyTypes, paymentMethods, sectors, unitOptions };

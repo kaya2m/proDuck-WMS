@@ -3,9 +3,8 @@ import MainCard from 'components/MainCard';
 import { Table, Input, Space, Button, Modal, Dropdown } from 'antd';
 import { SearchOutlined, PlusCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import request from 'api/apiRequest';
-import CreateCustomer from './createcustomer';
+import CreateCustomer from './createCustomer';
 import EditCustomer from './editCustomer';
-import './listcustomer.css';
 
 export default function Customer() {
   const [data, setData] = useState([]);

@@ -55,7 +55,7 @@ export default function AuthLogin({ isDemo = false }) {
         setSubmitting(false);
         updateUser(response.data.user);
         toastifyConfig.successToast('Giriş başarılı');
-        navigate('/dashboard/default', { replace: true });
+        navigate('/dashboard', { replace: true });
       }
     } catch (error) {
       setErrors({ submit: error.message });

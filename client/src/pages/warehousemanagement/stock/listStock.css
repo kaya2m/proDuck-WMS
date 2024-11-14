@@ -1,0 +1,19 @@
+.special-button {
+  background-color: #26c726;
+  border-color: #26c726;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.special-button:hover {
+  background-color: #22fc22 !important;
+  border-color: #22fc22;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.special-button:active {
+  background-color: #004d00;
+  border-color: #004d00;
+  transform: scale(0.98);
+}

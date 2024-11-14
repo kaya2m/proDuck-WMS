@@ -37,18 +37,20 @@ const rolesRouter = require("./routes/roles");
 const SupplierRouter = require("./routes/suppliers");
 const userRouter = require("./routes/user");
 const warehouseRouter = require("./routes/warehouse");
-const adress = require("./routes/address");
+const adressRouter = require("./routes/address");
+const stockRouter = require("./routes/stock");
 
 app.use("/auth", authRouter);
 app.use("/roles", rolesRouter);
-app.use("/categories", categoryRouter);
+app.use("/category", categoryRouter);
 app.use("/company", companyRouter);
 app.use("/customer", customerRouter);
 app.use("/product", productRouter);
 app.use("/suppliers", SupplierRouter);
 // app.use('/user', userRouter);
 app.use("/warehouse", warehouseRouter);
-app.use("/address", adress);
+app.use("/address", adressRouter);
+app.use("/stock", stockRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);

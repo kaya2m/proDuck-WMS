@@ -53,7 +53,7 @@ const warehousemanagement = {
       id: 'stock-management',
       title: 'Stok Yönetimi',
       type: 'item',
-      url: '/stock-management',
+      url: '/stock',
       icon: icons.DatabaseOutlined
     },
     {

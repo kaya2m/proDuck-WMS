@@ -4,10 +4,9 @@ import Dashboard from 'layout/Dashboard';
 import ProtectedRoute from './ProtectedRoute';
 
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/index')));
-const Customer = Loadable(lazy(() => import('pages/relationmanagement/customer/listcustomer')));
+const Customer = Loadable(lazy(() => import('pages/relationmanagement/customer/listCustomer')));
 const Supplier = Loadable(lazy(() => import('pages/relationmanagement/supplier/listSupplier')));
-const Company = Loadable(lazy(() => import('pages/relationmanagement/company/listCompany')));
-
+const Stock = Loadable(lazy(() => import('pages/warehousemanagement/stock/listStock')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -19,15 +18,7 @@ const MainRoutes = {
   ),
   children: [
     {
-      path: '/',
-      element: (
-        <ProtectedRoute requiredRole="admin">
-          <DashboardDefault />
-        </ProtectedRoute>
-      )
-    },
-    {
-      path: 'dashboard/default',
+      path: '/dashboard',
       element: (
         <ProtectedRoute requiredRole="admin">
           <DashboardDefault />
@@ -51,10 +42,10 @@ const MainRoutes = {
       )
     },
     {
-      path: 'company',
+      path: 'stock',
       element: (
         <ProtectedRoute requiredRole="admin">
-          <Company />
+          <Stock />
         </ProtectedRoute>
       )
     }
