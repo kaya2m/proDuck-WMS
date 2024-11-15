@@ -1,10 +1,10 @@
 // assets
-import { UserOutlined, FileSearchOutlined, SettingOutlined } from '@ant-design/icons';
+import { UserOutlined, FileSearchOutlined, SettingOutlined, ControlOutlined } from '@ant-design/icons';
 
 // icons
-const icons = { UserOutlined, FileSearchOutlined, SettingOutlined };
+const icons = { UserOutlined, FileSearchOutlined, SettingOutlined, ControlOutlined };
 
-const settings = {  
+const settings = {
   id: 'setting',
   title: 'Uygulama Ayarları',
   type: 'group',
@@ -22,6 +22,13 @@ const settings = {
       type: 'item',
       url: '/reporting-analytics',
       icon: icons.FileSearchOutlined
+    },
+    {
+      id: 'app-constants',
+      title: 'Uygulama Sabitleri',
+      type: 'item',
+      url: '/app-constants',
+      icon: icons.ControlOutlined
     },
     {
       id: 'settings',
