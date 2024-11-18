@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const supplierSchema = new Schema(
   {
     name: { type: String, required: true, unique: true, trim: true },
+    code: { type: String, required: true, unique: true, trim: true },
     contactPerson: {
       name: { type: String, trim: true },
       title: { type: String, trim: true },

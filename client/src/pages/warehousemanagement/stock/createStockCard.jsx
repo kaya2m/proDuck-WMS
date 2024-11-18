@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Input, Select, Button, Form, Card, Typography } from 'antd';
+import { Input, Select, Button, Form, Card, Typography, DatePicker } from 'antd';
 import request from '../../../api/apiRequest';
 import { ArrowLeftOutlined, UploadOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { errorAlert, successAlert, confirmAlert } from '../../../common/sweatAlertConfig';
@@ -49,7 +49,7 @@ export default function CreateStockCard({ onSave, onCancel }) {
     try {
       const isConfirmed = await confirmAlert('Yeni Stok Kartı Tanımlama', 'Stok kartı oluşturulacak, onaylıyor musunuz?');
       if (isConfirmed) {
-        const response = await request.post('/stock', data);
+        const response = await request.post('/stockCard', data);
         if (response.status === 201) {
           toastify.successToast('Stok kartı başarıyla oluşturuldu');
           onSave(response.data);
@@ -158,17 +158,29 @@ export default function CreateStockCard({ onSave, onCancel }) {
                 <div className="col-md-4">
                   {' '}
                   <Form.Item label="Genişlik">
-                    <Controller name="dimensions.width" control={control} render={({ field }) => <Input {...field} />} />
+                    <Controller
+                      name="dimensions.width"
+                      control={control}
+                      render={({ field }) => <Input type="number" min={0} suffix="cm" {...field} />}
+                    />
                   </Form.Item>
                 </div>
                 <div className="col-md-4">
                   <Form.Item label="Yükseklik">
-                    <Controller name="dimensions.height" control={control} render={({ field }) => <Input {...field} />} />
+                    <Controller
+                      name="dimensions.height"
+                      control={control}
+                      render={({ field }) => <Input type="number" min={0} suffix="cm" {...field} />}
+                    />
                   </Form.Item>
                 </div>
                 <div className="col-md-4">
                   <Form.Item label="Derinlik">
-                    <Controller name="dimensions.depth" control={control} render={({ field }) => <Input {...field} />} />
+                    <Controller
+                      name="dimensions.depth"
+                      control={control}
+                      render={({ field }) => <Input type="number" min={0} suffix="cm" {...field} />}
+                    />
                   </Form.Item>
                 </div>
               </div>
@@ -177,17 +189,29 @@ export default function CreateStockCard({ onSave, onCancel }) {
               <div className="form-fields">
                 {/* Purchase Price */}
                 <Form.Item label="Alış Fiyatı">
-                  <Controller name="pricing.purchasePrice" control={control} render={({ field }) => <Input {...field} />} />
+                  <Controller
+                    name="pricing.purchasePrice"
+                    control={control}
+                    render={({ field }) => <Input type="number" min={0} {...field} />}
+                  />
                 </Form.Item>
 
                 {/* Sale Price */}
                 <Form.Item label="Öngörülen Satış Fiyatı">
-                  <Controller name="pricing.salePrice" control={control} render={({ field }) => <Input {...field} />} />
+                  <Controller
+                    name="pricing.salePrice"
+                    control={control}
+                    render={({ field }) => <Input type="number" min={0} {...field} />}
+                  />
                 </Form.Item>
 
                 {/* Tax Rate */}
                 <Form.Item label="Vergi Oranı">
-                  <Controller name="pricing.taxRate" control={control} render={({ field }) => <Input {...field} />} />
+                  <Controller
+                    name="pricing.taxRate"
+                    control={control}
+                    render={({ field }) => <Input prefix="%" type="number" min={0} {...field} />}
+                  />
                 </Form.Item>
 
                 {/* Discount Rates */}
@@ -197,7 +221,7 @@ export default function CreateStockCard({ onSave, onCancel }) {
                       <Controller
                         name="pricing.minDiscountRates"
                         control={control}
-                        render={({ field }) => <Input prefix="%" {...field} />}
+                        render={({ field }) => <Input prefix="%" type="number" min={0} {...field} />}
                       />
                     </Form.Item>
                   </div>
@@ -206,7 +230,7 @@ export default function CreateStockCard({ onSave, onCancel }) {
                       <Controller
                         name="pricing.maxDiscountRates"
                         control={control}
-                        render={({ field }) => <Input prefix="%" {...field} />}
+                        render={({ field }) => <Input prefix="%" type="number" min={0} {...field} />}
                       />
                     </Form.Item>
                   </div>
@@ -240,7 +264,11 @@ export default function CreateStockCard({ onSave, onCancel }) {
                 <Controller name="additionalInfo.notes" control={control} render={({ field }) => <Input {...field} />} />
               </Form.Item>
               <Form.Item label="Garanti Süresi">
-                <Controller name="additionalInfo.warrantyPeriod" control={control} render={({ field }) => <Input {...field} />} />
+                <Controller
+                  name="additionalInfo.warrantyPeriod"
+                  control={control}
+                  render={({ field }) => <Input type="number" min={0} {...field} />}
+                />
               </Form.Item>
               <Form.Item label="Renk">
                 <Controller name="additionalInfo.color" control={control} render={({ field }) => <Input {...field} />} />
@@ -251,47 +279,55 @@ export default function CreateStockCard({ onSave, onCancel }) {
               <Form.Item label="Malzeme">
                 <Controller name="additionalInfo.material" control={control} render={({ field }) => <Input {...field} />} />
               </Form.Item>
-              {/* Expiry Date */}
-              <Form.Item label="Son Kullanma Tarihi">
-                <Controller name="expiryDate" control={control} render={({ field }) => <Input {...field} />} />
-              </Form.Item>
-
-              {/* Costing Method */}
-              <Form.Item label="Maliyetlendirme Yöntemi">
-                <Controller
-                  name="costingMethod"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      options={[
-                        { value: 'FIFO', label: 'FIFO' },
-                        { value: 'LIFO', label: 'LIFO' },
-                        { value: 'Average', label: 'Ortalama' }
-                      ]}
-                      placeholder="Maliyetlendirme Yöntemi Seçiniz"
+              <div className="row">
+                <div className="col-md-8">
+                  {' '}
+                  {/* Costing Method */}
+                  <Form.Item label="Maliyetlendirme Yöntemi">
+                    <Controller
+                      name="costingMethod"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          options={[
+                            { value: 'FIFO', label: 'FIFO' },
+                            { value: 'LIFO', label: 'LIFO' },
+                            { value: 'Average', label: 'Ortalama' }
+                          ]}
+                          placeholder="Maliyetlendirme Yöntemi Seçiniz"
+                        />
+                      )}
                     />
-                  )}
-                />
-              </Form.Item>
+                  </Form.Item>
+                </div>
+                <div className="col-md-4">
+                  {' '}
+                  {/* Expiry Date */}
+                  <Form.Item label="Son Kullanma Tarihi">
+                    <Controller name="expiryDate" control={control} render={({ field }) => <DatePicker {...field} />} />
+                  </Form.Item>
+                </div>
+              </div>
+
               {/* Levels */}
               <div className="row">
                 <div className="col-md-4">
                   {' '}
                   <Form.Item label="Minimum Seviye">
-                    <Controller name="minLevel" control={control} render={({ field }) => <Input {...field} />} />
+                    <Controller name="minLevel" control={control} render={({ field }) => <Input type="number" min={0} {...field} />} />
                   </Form.Item>
                 </div>
                 <div className="col-md-4">
                   {' '}
                   <Form.Item label="Maksimum Seviye">
-                    <Controller name="maxLevel" control={control} render={({ field }) => <Input {...field} />} />
+                    <Controller name="maxLevel" control={control} render={({ field }) => <Input type="number" min={0} {...field} />} />
                   </Form.Item>
                 </div>
                 <div className="col-md-4">
                   {' '}
                   <Form.Item label="Kritik Seviye">
-                    <Controller name="criticalLevel" control={control} render={({ field }) => <Input {...field} />} />
+                    <Controller name="criticalLevel" control={control} render={({ field }) => <Input type="number" min={0} {...field} />} />
                   </Form.Item>
                 </div>
               </div>

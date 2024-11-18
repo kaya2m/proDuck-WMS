@@ -5,6 +5,7 @@ import request from '../../../api/apiRequest';
 export default function StockEntryExitDialog({ visible, onClose }) {
   const [form] = Form.useForm();
   const [warehouseOptions, setWarehouseOptions] = useState([]);
+  const [stockCardOptions, setStockCardOptions] = useState([]);
 
   const handleSave = () => {
     form
@@ -18,9 +19,21 @@ export default function StockEntryExitDialog({ visible, onClose }) {
       });
   };
   const onSearchForStockCard = (value) => {
-    console.log(value);
+    if (value) {
+      request
+        .get(`/stockCard/search?query=${value}`)
+        .then((response) => {
+          const options = response.data.map((item) => ({ value: item._id, label: item.productCode }));
+          setStockCardOptions(options);
+        })
+        .catch((error) => {
+          console.error('API Error:', error);
+        });
+    } else {
+      setStockCardOptions([]);
+    }
   };
-  
+
   const onSearchForWarehouse = (value) => {
     if (value) {
       request
@@ -53,7 +66,12 @@ export default function StockEntryExitDialog({ visible, onClose }) {
     >
       <Form form={form} layout="vertical">
         <Form.Item name="stockCard" label="Stok Kartı" rules={[{ required: true, message: 'Lütfen stok kartını girin!' }]}>
-          <AutoComplete onSearch={onSearchForStockCard} options={[{ value: 'Stok Kartı 1' }, { value: 'Stok Kartı 2' }]} placeholder="Stok Kartı Seçin" />
+          <AutoComplete
+            onSearch={onSearchForStockCard}
+            options={stockCardOptions}
+            onSelect={(value, option) => form.setFieldsValue({ stockCard: option.label })}
+            placeholder="Stok Kartı Seçin"
+          />
         </Form.Item>
         <Form.Item name="warehouse" label="Depo" rules={[{ required: true, message: 'Lütfen depo bilgisini girin!' }]}>
           <AutoComplete onSearch={onSearchForWarehouse} options={warehouseOptions} placeholder="Depo Seçin" />

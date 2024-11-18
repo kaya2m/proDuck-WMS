@@ -4,7 +4,7 @@ const express = require("express");
 const router = express.Router();
 const Stock = require("../models/stock.model");
 
-router.post("/stock", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const newStock = new Stock(req.body);
     const savedStock = await newStock.save();
@@ -14,7 +14,7 @@ router.post("/stock", async (req, res) => {
   }
 });
 
-router.get("/stock", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const stocks = await Stock.find();
     res.status(200).json(stocks);
@@ -23,7 +23,7 @@ router.get("/stock", async (req, res) => {
   }
 });
 
-router.get("/stock/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const stock = await Stock.findById(req.params.id);
     if (stock) {
@@ -36,7 +36,7 @@ router.get("/stock/:id", async (req, res) => {
   }
 });
 
-router.put("/stock/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const updatedStock = await Stock.findByIdAndUpdate(
       req.params.id,
@@ -53,7 +53,7 @@ router.put("/stock/:id", async (req, res) => {
   }
 });
 
-router.delete("/stock/:id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const deletedStock = await Stock.findByIdAndDelete(req.params.id);
     if (deletedStock) {

@@ -93,6 +93,7 @@ router.put(
   validate,
   async (req, res) => {
     const {
+      code,
       name,
       contactPerson,
       phone,
@@ -116,6 +117,7 @@ router.put(
         return res.status(404).json({ message: "Tedarikçi bulunamadı." });
       }
 
+      supplier.code = code;
       supplier.name = name;
       supplier.contactPerson = contactPerson;
       supplier.phone = phone;

@@ -28,10 +28,11 @@ export default function StockList() {
           key: index + 1,
           ...stock
         }));
+        console.log(stockData);
         setData(stockData);
         setFilteredData(stockData);
-        const lowStock = stockData.filter((item) => item.currentQuantity <= item.criticalLevel);
-        setLowStockItems(lowStock);
+        //const lowStock = stockData.filter((item) => item.currentQuantity <= item.criticalLevel);
+        //setLowStockItems(lowStock);
       })
       .catch((error) => console.error('Error fetching stock data:', error));
   }, []);

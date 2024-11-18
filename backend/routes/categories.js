@@ -16,7 +16,7 @@ route.get('/', authenticateToken, async (req, res) => {
 );
 
 route.post('/', authenticateToken, categoryValidationRules(), validate, async (req, res) => {
-    const { name, description } = req.body;
+    const { name, description,code } = req.body;
     try {
         let category = await Category.findOne({ name });
         if (category) {
@@ -24,7 +24,8 @@ route.post('/', authenticateToken, categoryValidationRules(), validate, async (r
         }
         category = new Category({
             name,
-            description
+            description,
+            code
 
         });
         await category.save();

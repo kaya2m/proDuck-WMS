@@ -3,8 +3,12 @@ const mongoose = require("mongoose");
 const stockCardSchema = new mongoose.Schema(
   {
     productCode: { type: String, required: true, unique: true },
-    productCodeUnique: { type: String, required: true },
-    category: { type: String },
+    productCodeUnique: { type: String, required: true, unique: true },
+    supplier: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
     brand: { type: String },
     model: { type: String },
     unit: { type: String },

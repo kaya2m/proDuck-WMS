@@ -34,6 +34,9 @@ export default function CategoryCreate({ visible, onCreate, onCancel }) {
         <Form.Item name="name" label="Kategori Adı" rules={[{ required: true, message: 'Lütfen kategori adını girin!' }]}>
           <Input />
         </Form.Item>
+        <Form.Item name="code" label="Kategori Kodu" rules={[{ required: true, message: 'Lütfen kategori kodunu girin!' }]}>
+          <Input />
+        </Form.Item>
         <Form.Item name="description" label="Açıklama">
           <Input.TextArea />
         </Form.Item>
