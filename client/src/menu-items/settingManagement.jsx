@@ -1,8 +1,8 @@
 // assets
-import { UserOutlined, FileSearchOutlined, SettingOutlined, ControlOutlined } from '@ant-design/icons';
+import { UserOutlined, FileSearchOutlined, SettingOutlined, ControlOutlined, GroupOutlined } from '@ant-design/icons';
 
 // icons
-const icons = { UserOutlined, FileSearchOutlined, SettingOutlined, ControlOutlined };
+const icons = { UserOutlined, FileSearchOutlined, SettingOutlined, ControlOutlined, GroupOutlined };
 
 const settings = {
   id: 'setting',
@@ -15,6 +15,13 @@ const settings = {
       type: 'item',
       url: '/user-management',
       icon: icons.UserOutlined
+    },
+    {
+      id: 'warehouse-setting',
+      title: ' Depo Ayarları',
+      type: 'item',
+      url: '/warehouse-setting',
+      icon: icons.GroupOutlined
     },
     {
       id: 'reporting-analytics',

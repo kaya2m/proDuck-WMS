@@ -7,6 +7,7 @@ const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/index')));
 const Customer = Loadable(lazy(() => import('pages/relationmanagement/customer/listCustomer')));
 const Supplier = Loadable(lazy(() => import('pages/relationmanagement/supplier/listSupplier')));
 const Stock = Loadable(lazy(() => import('pages/warehousemanagement/stock/listStock')));
+const WarehouseList = Loadable(lazy(() => import('pages/appSettings/warehouse/warehouseList')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -46,6 +47,14 @@ const MainRoutes = {
       element: (
         <ProtectedRoute requiredRole="admin">
           <Stock />
+        </ProtectedRoute>
+      )
+    },
+    {
+      path: 'warehouse-setting',
+      element: (
+        <ProtectedRoute requiredRole="admin">
+          <WarehouseList />
         </ProtectedRoute>
       )
     }

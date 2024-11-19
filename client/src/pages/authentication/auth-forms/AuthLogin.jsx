@@ -49,6 +49,8 @@ export default function AuthLogin({ isDemo = false }) {
 
   const handleSubmit = async (values, { setErrors, setStatus, setSubmitting }) => {
     try {
+      debugger;
+
       const response = await request.post('/auth/login', values);
       if (response.data) {
         setStatus({ success: true });
@@ -58,9 +60,9 @@ export default function AuthLogin({ isDemo = false }) {
         navigate('/dashboard', { replace: true });
       }
     } catch (error) {
-      setErrors({ submit: error.message });
+      setErrors({ submit: error.response.data.message });
       setSubmitting(false);
-      toastifyConfig.errorToast(error.message);
+      toastifyConfig.errorToast(error.response.data.message);
     }
   };
 
