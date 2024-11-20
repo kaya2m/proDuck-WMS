@@ -15,6 +15,7 @@ const userSchema = new Schema({
     image: { type: String, required: false },
     phone: { type: String, required: false },
     address: { type: String, required: false },
+    companyId: { type: Schema.Types.ObjectId, ref: 'Company', required: true },
 }, {
     timestamps: true,
 });

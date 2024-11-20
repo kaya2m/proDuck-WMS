@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Card, Button, Avatar, Badge } from 'antd';
 import request from '../../../api/apiRequest';
 import {
@@ -14,80 +14,87 @@ import {
   PlusOutlined
 } from '@ant-design/icons';
 import warehouseDefault from '../../../assets/images/warehouse-default.png';
+import CreateWarehouse from './warehouseCreate';
 const { Meta } = Card;
-export default function WarehouseList() {
-  const [warehouses, setWarehouses] = useState([]);
+import { AuthContext } from '../../../utils/AuthUtils/AuthContext';
 
+export default function WarehouseList() {
+  const { currentUser } = useContext(AuthContext);
+  const [warehouses, setWarehouses] = useState([]);
+  const [showCreateForm, setShowCreateForm] = useState(false);
   useEffect(() => {
     const fetchWarehouses = async () => {
-      const response = await request.get('/warehouse');
+      const response = await request.get(`/warehouse/${currentUser.company._id}`);
       setWarehouses(response.data);
     };
     fetchWarehouses();
   }, []);
-
+  const handleCreateWarehouse = () => {
+    setShowCreateForm(true);
+  };
+  const handleCancelCreateWarehouse = () => {
+    setShowCreateForm(false);
+  };
   return (
     <div className="row">
       <div className="col-12 mb-3">
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => {
-            /* yeni depo oluşturma işlemi */
-          }}
-        >
+        <Button type="primary" hidden={showCreateForm} icon={<PlusOutlined />} onClick={handleCreateWarehouse}>
           Yeni Depo Ekle
         </Button>
       </div>
-      {warehouses.map((warehouse) => (
-        <div className="col-md-3 mb-3" key={warehouse.companyId}>
-          <Card
-            cover={<img alt="warehouse-img" src={warehouse.image || warehouseDefault} className="img-fluid rounded w-100 h-auto" />}
-            actions={[
-              <EyeOutlined key="setting" style={{ color: '#4096FF' }} />,
-              <EditOutlined key="edit" style={{ color: 'orange' }} />,
-              <DeleteOutlined key="ellipsis" style={{ color: 'red' }} />
-            ]}
-          >
-            <Meta
-              avatar={<Avatar icon={<SettingFilled />} />}
-              title={
-                <div className="d-flex align-items-center justify-content-between">
-                  <h5>{warehouse.name}</h5>
-                  <h5 className="ms-2">{warehouse.code}</h5>
-                </div>
-              }
-              description={
-                <div>
-                  <div className="mb-2 text-muted">
-                    <h6>{warehouse.description}</h6>
+      {showCreateForm ? (
+        <CreateWarehouse onSave={() => setShowCreateForm(false)} onCancel={handleCancelCreateWarehouse} />
+      ) : (
+        warehouses.map((warehouse) => (
+          <div className="col-md-3 mb-3" key={warehouse.companyId}>
+            <Card
+              cover={<img alt="warehouse-img" src={warehouse.image || warehouseDefault} className="img-fluid rounded w-100 h-auto" />}
+              actions={[
+                <EyeOutlined key="setting" style={{ color: '#4096FF' }} />,
+                <EditOutlined key="edit" style={{ color: 'orange' }} />,
+                <DeleteOutlined key="ellipsis" style={{ color: 'red' }} />
+              ]}
+            >
+              <Meta
+                avatar={<Avatar icon={<SettingFilled />} />}
+                title={
+                  <div className="d-flex align-items-center justify-content-between">
+                    <h5>{warehouse.name}</h5>
+                    <h5 className="ms-2">{warehouse.code}</h5>
                   </div>
+                }
+                description={
                   <div>
-                    <Badge count={<HomeOutlined className="text-primary me-2" />} />
-                    <b>Adres:</b> {warehouse.address}
+                    <div className="mb-2 text-muted">
+                      <h6>{warehouse.description}</h6>
+                    </div>
+                    <div>
+                      <Badge count={<HomeOutlined className="text-primary me-2" />} />
+                      <b>Adres:</b> {warehouse.address}
+                    </div>
+                    <div>
+                      <Badge count={<PhoneOutlined className="text-primary me-2" />} />
+                      <b>Telefon:</b> {warehouse.phone}
+                    </div>
+                    <div>
+                      <Badge count={<AppstoreOutlined className="text-primary me-2" />} />
+                      <b>Depo Türü:</b> {warehouse.warehouseType}
+                    </div>
+                    <div>
+                      <Badge count={<AreaChartOutlined className="text-primary me-2" />} />
+                      <b>Alan:</b> {warehouse.warehouseArea} m²
+                    </div>
+                    <div>
+                      <Badge count={<GatewayOutlined className="text-primary me-2" />} />
+                      <b>Kapı Sayısı:</b> {warehouse.warehouseGateCount}
+                    </div>
                   </div>
-                  <div>
-                    <Badge count={<PhoneOutlined className="text-primary me-2" />} />
-                    <b>Telefon:</b> {warehouse.phone}
-                  </div>
-                  <div>
-                    <Badge count={<AppstoreOutlined className="text-primary me-2" />} />
-                    <b>Depo Türü:</b> {warehouse.warehouseType}
-                  </div>
-                  <div>
-                    <Badge count={<AreaChartOutlined className="text-primary me-2" />} />
-                    <b>Alan:</b> {warehouse.warehouseArea} m²
-                  </div>
-                  <div>
-                    <Badge count={<GatewayOutlined className="text-primary me-2" />} />
-                    <b>Kapı Sayısı:</b> {warehouse.warehouseGateCount}
-                  </div>
-                </div>
-              }
-            />
-          </Card>
-        </div>
-      ))}
+                }
+              />
+            </Card>
+          </div>
+        ))
+      )}
     </div>
   );
 }

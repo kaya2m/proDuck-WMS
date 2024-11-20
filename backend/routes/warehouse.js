@@ -6,9 +6,11 @@ const {
 const validate = require("../middlewares/validate");
 const authenticateToken = require("../middlewares/authenticate");
 
-router.get("/", authenticateToken, async (req, res) => {
+router.get("/:companyId", authenticateToken, async (req, res) => {
   try {
-    const warehouses = await Warehouse.find();
+    const warehouses = await Warehouse.find({
+      companyId: req.params.companyId,
+    });
     res.json(warehouses);
   } catch (err) {
     console.error(err);
@@ -74,7 +76,7 @@ router.post(
 
       warehouse = new Warehouse({
         companyId,
-        code,
+        code: await generateWarehouseCode(companyId),
         name,
         description,
         status,

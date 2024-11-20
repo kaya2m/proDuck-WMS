@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require("uuid");
 const Category = require("../models/categories.model");
-const Supplier = require("../models/suppliers.model");
 const StockCard = require("../models/stockCard.model");
+const Warehouse = require("../models/warehouse.model");
 
 function generateCustomerCode() {
   const prefix = "CSTMR";
@@ -25,6 +25,15 @@ async function generateProductCodeUnique(categoryId) {
     const year = new Date().getFullYear();
 
     return `${categoryCode}-${stockNumber}-${year}`;
+  }
+  return null;
+}
+
+async function generateWarehouseCode(companyId) {
+  if (companyId !== null) {
+    const warehouseCount = await Warehouse.countDocuments({ companyId });
+    const warehouseNumber = (warehouseCount + 1).toString().padStart(3, "0");
+    return `WH${warehouseNumber}`;
   }
   return null;
 }

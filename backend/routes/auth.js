@@ -44,7 +44,7 @@ router.post("/login", loginValidationRules(), validate, async (req, res) => {
 
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).populate("companyId");
   if (!user) {
     return res.status(400).json({ message: "Geçersiz e-posta veya şifre." });
   }
@@ -74,6 +74,8 @@ router.post("/login", loginValidationRules(), validate, async (req, res) => {
       role: user.role,
       name: user.name,
       surname: user.surname,
+      company: user.companyId,
+      companyName: user.companyId.name,
     },
   });
 });
