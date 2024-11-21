@@ -43,4 +43,5 @@ module.exports = {
   generateBarcode,
   generateGtipCode,
   generateProductCodeUnique,
+  generateWarehouseCode,
 };

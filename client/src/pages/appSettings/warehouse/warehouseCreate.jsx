@@ -2,11 +2,9 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Input, Select, Button, Form, Card, Typography, DatePicker, Space } from 'antd';
 import request from '../../../api/apiRequest';
-import { ArrowLeftOutlined, UploadOutlined, PlusCircleOutlined, PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
-import { errorAlert, successAlert, confirmAlert } from '../../../common/sweatAlertConfig';
+import { ArrowLeftOutlined, PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { confirmAlert } from '../../../common/sweatAlertConfig';
 import toastify from '../../../common/toastifyConfig';
-import constants from '../../../common/constants';
-import TextArea from 'antd/es/input/TextArea';
 import { AuthContext } from '../../../utils/AuthUtils/AuthContext';
 
 export default function CreateWarehouse({ onSave, onCancel }) {
@@ -14,18 +12,40 @@ export default function CreateWarehouse({ onSave, onCancel }) {
     handleSubmit,
     control,
     formState: { errors },
-    setValue,
-    getValues
+    setValue
   } = useForm({});
   const { currentUser } = useContext(AuthContext);
-  const [suppliers, setSuppliers] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [countries, setCountries] = useState([]);
+  const [cities, setCities] = useState([]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await request.get('/address/country');
+        setCountries(response.data);
+        const defaultCountry = response.data.find((country) => country.name === 'Türkiye');
+        if (defaultCountry) {
+          setValue('countryId', defaultCountry._id);
+        }
+      } catch (error) {
+        console.error('Ülkeleri getirme hatası:', error);
+      }
+    };
+    fetchCountries();
+  }, [setValue]);
+
+  const handleCountryChange = async (countryId) => {
+    try {
+      const response = await request.get(`/address/city?countryId=${countryId}`);
+      setCities(response.data);
+    } catch (error) {
+      console.error('Şehirleri getirme hatası:', error);
+    }
+  };
 
   const onSubmit = async (data) => {
-    console.log(data);
     try {
+      console.log(data);
       const isConfirmed = await confirmAlert('Yeni Depo Tanımlama', 'Depo oluşturulacak, onaylıyor musunuz?');
       if (isConfirmed) {
         const response = await request.post('/warehouse', data);
@@ -204,41 +224,25 @@ export default function CreateWarehouse({ onSave, onCancel }) {
               <Form.List name="racks">
                 {(fields, { add, remove }) => (
                   <>
-                    {fields.map(({ key, name, fieldKey, ...restField }) => (
+                    {fields.map(({ key, name, ...restField }) => (
                       <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'rackCode']}
-                          fieldKey={[fieldKey, 'rackCode']}
-                          rules={[{ required: true, message: 'Raf kodu zorunludur' }]}
-                        >
+                        <Form.Item {...restField} name={[name, 'rackCode']} rules={[{ required: true, message: 'Raf kodu zorunludur' }]}>
                           <Input placeholder="Raf Kodu" />
                         </Form.Item>
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'zoneCode']}
-                          fieldKey={[fieldKey, 'zoneCode']}
-                          rules={[{ required: true, message: 'Bölge kodu zorunludur' }]}
-                        >
+                        <Form.Item {...restField} name={[name, 'zoneCode']} rules={[{ required: true, message: 'Bölge kodu zorunludur' }]}>
                           <Input placeholder="Bölge Kodu" />
                         </Form.Item>
                         <Form.Item
                           {...restField}
                           name={[name, 'shelfCount']}
-                          fieldKey={[fieldKey, 'shelfCount']}
                           rules={[{ required: true, message: 'Raf sayısı zorunludur' }]}
                         >
                           <Input type="number" placeholder="Raf Sayısı" />
                         </Form.Item>
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'capacity']}
-                          fieldKey={[fieldKey, 'capacity']}
-                          rules={[{ required: true, message: 'Kapasite zorunludur' }]}
-                        >
+                        <Form.Item {...restField} name={[name, 'capacity']} rules={[{ required: true, message: 'Kapasite zorunludur' }]}>
                           <Input type="number" placeholder="Kapasite" />
                         </Form.Item>
-                        <Form.Item {...restField} name={[name, 'usedCapacity']} fieldKey={[fieldKey, 'usedCapacity']}>
+                        <Form.Item {...restField} name={[name, 'usedCapacity']}>
                           <Input type="number" placeholder="Kullanılan Kapasite" />
                         </Form.Item>
                         <MinusCircleOutlined onClick={() => remove(name)} />
@@ -289,6 +293,7 @@ export default function CreateWarehouse({ onSave, onCancel }) {
               <Form.Item label="Sıcaklık Aralığı">
                 <Controller name="operations.temperatureRange" control={control} render={({ field }) => <Input {...field} />} />
               </Form.Item>
+
               {/* Management */}
               <Typography className="section-title">Yönetim</Typography>
               <Form.Item label="Yönetici Adı">
@@ -297,50 +302,92 @@ export default function CreateWarehouse({ onSave, onCancel }) {
               <Form.Item label="Yönetici İletişim">
                 <Controller name="management.managerContact" control={control} render={({ field }) => <Input {...field} />} />
               </Form.Item>
+
               {/* Address */}
               <Typography className="section-title ">Adres Bilgileri</Typography>
-              <Form.Item
-                label="Sokak"
-                validateStatus={errors.address?.street && 'error'}
-                help={errors.address?.street && 'Sokak zorunludur'}
-              >
-                <Controller
-                  name="address.street"
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field }) => <Input {...field} />}
-                />
-              </Form.Item>
-              <Form.Item label="Şehir" validateStatus={errors.address?.city && 'error'} help={errors.address?.city && 'Şehir zorunludur'}>
-                <Controller name="address.city" control={control} rules={{ required: true }} render={({ field }) => <Input {...field} />} />
-              </Form.Item>
-              <Form.Item
-                label="Posta Kodu"
-                validateStatus={errors.address?.postalCode && 'error'}
-                help={errors.address?.postalCode && 'Posta kodu zorunludur'}
-              >
-                <Controller
-                  name="address.postalCode"
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field }) => <Input {...field} />}
-                />
-              </Form.Item>
+              {/* Address Fields */}
               <Form.Item
                 label="Ülke"
-                validateStatus={errors.address?.country && 'error'}
-                help={errors.address?.country && 'Ülke zorunludur'}
+                validateStatus={errors.address?.countryId && 'error'}
+                help={errors.address?.countryId && 'Ülke seçimi zorunludur'}
               >
                 <Controller
-                  name="address.country"
+                  name="address.countryId"
                   control={control}
                   rules={{ required: true }}
-                  render={({ field }) => <Input {...field} />}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      placeholder="Ülke Seçiniz"
+                      options={countries.map((country) => ({
+                        value: country._id,
+                        label: country.name
+                      }))}
+                      showSearch
+                      optionFilterProp="label"
+                      onChange={(value) => {
+                        field.onChange(value);
+                        handleCountryChange(value);
+                      }}
+                    />
+                  )}
                 />
               </Form.Item>
-              <Form.Item label="Adres Detayı">
-                <Controller name="address.addressDetail" control={control} render={({ field }) => <Input.TextArea {...field} />} />
+
+              {/* City */}
+              <Form.Item
+                label="İl"
+                validateStatus={errors.address?.cityId && 'error'}
+                help={errors.address?.cityId && 'İl seçimi zorunludur'}
+              >
+                <Controller
+                  name="address.cityId"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      placeholder="İl Seçiniz"
+                      options={cities.map((city) => ({
+                        value: city._id,
+                        label: city.sehir_adi,
+                        cityId: city.sehir_id
+                      }))}
+                      showSearch
+                      optionFilterProp="label"
+                      onChange={(e, { cityId }) => {
+                        field.onChange(e);
+                      }}
+                    />
+                  )}
+                />
               </Form.Item>
+              {/* District */}
+              <Form.Item
+                label="İlçe"
+                validateStatus={errors.address?.district && 'error'}
+                help={errors.address?.district && 'İlçe seçimi zorunludur'}
+              >
+                <Controller name="address.district" control={control} render={({ field }) => <Input {...field} />} />
+              </Form.Item>
+
+              <Form.Item label="Posta Kodu">
+                <Controller name="address.postalCode" control={control} render={({ field }) => <Input {...field} />} />
+              </Form.Item>
+
+              <Form.Item
+                label="Address"
+                validateStatus={errors.address?.address && 'error'}
+                help={errors.address?.address && 'Adres zorunludur'}
+              >
+                <Controller
+                  name="address.addressDetail"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => <Input.TextArea {...field} rows={4} />}
+                />
+              </Form.Item>
+
               {/* Location */}
               <Typography className="section-title mt-2">Konum</Typography>
               <Form.Item

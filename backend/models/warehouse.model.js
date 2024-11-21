@@ -22,10 +22,10 @@ const warehouseSchema = new Schema(
     status: { type: Boolean, default: true }, // Aktiflik durumu
     image: { type: String }, // Depo resmi URL'si
     address: {
-      street: { type: String, required: true, trim: true },
-      city: { type: String, required: true, trim: true },
+      district: { type: String, required: true, trim: true },
+      cityId: { type: Schema.Types.ObjectId, ref: "City", required: true },
       postalCode: { type: String, required: true, trim: true },
-      country: { type: String, required: true, trim: true },
+      countryId: { type: Schema.Types.ObjectId,  ref: "Country", required: true, },
       addressDetail: { type: String, trim: true },
     },
     contact: {

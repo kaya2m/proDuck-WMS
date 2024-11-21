@@ -24,8 +24,6 @@ router.route("/district/:id").get(async (req, res) => {
       if (!citys) {
         return res.status(404).json("Hata: Şehir bulunamadı");
       }
-      var cityId = citys.sehir_id;
-
       district
         .find({ sehir_id: cityId })
         .then((district) => {

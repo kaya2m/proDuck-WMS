@@ -24,8 +24,12 @@ export default function WarehouseList() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   useEffect(() => {
     const fetchWarehouses = async () => {
-      const response = await request.get(`/warehouse/${currentUser.company._id}`);
-      setWarehouses(response.data);
+      request
+        .get(`/warehouse/${currentUser.company._id}`)
+        .then((response) => {
+          setWarehouses(response.data);
+        })
+        .catch((error) => console.error('Error fetching stock data:', error));
     };
     fetchWarehouses();
   }, []);
@@ -46,7 +50,7 @@ export default function WarehouseList() {
         <CreateWarehouse onSave={() => setShowCreateForm(false)} onCancel={handleCancelCreateWarehouse} />
       ) : (
         warehouses.map((warehouse) => (
-          <div className="col-md-3 mb-3" key={warehouse.companyId}>
+          <div className="col-md-3 mb-3" key={warehouse._id}>
             <Card
               cover={<img alt="warehouse-img" src={warehouse.image || warehouseDefault} className="img-fluid rounded w-100 h-auto" />}
               actions={[

@@ -5,6 +5,7 @@ const {
 } = require("../validators/warehouseValidator");
 const validate = require("../middlewares/validate");
 const authenticateToken = require("../middlewares/authenticate");
+const { generateWarehouseCode } = require("../common/functions");
 
 router.get("/:companyId", authenticateToken, async (req, res) => {
   try {
@@ -50,49 +51,17 @@ router.post(
   warehouseValidationRules(),
   validate,
   async (req, res) => {
-    const {
-      companyId,
-      code,
-      name,
-      description,
-      status,
-      image,
-      address,
-      address2,
-      phone,
-      phone2,
-      warehouseType,
-      warehouseArea,
-      warehouseCapacity,
-      warehouseVolume,
-      warehouseRackCount,
-      warehouseGateCount,
-    } = req.body;
     try {
-      let warehouse = await Warehouse.findOne({ code });
-      if (warehouse) {
+      let warehouseName = await Warehouse.findOne({ name: req.body.name });
+      if (warehouseName) {
         return res.status(400).json({ message: "Bu depo zaten var." });
       }
-
-      warehouse = new Warehouse({
-        companyId,
-        code: await generateWarehouseCode(companyId),
-        name,
-        description,
-        status,
-        image,
-        address,
-        address2,
-        phone,
-        phone2,
-        warehouseType,
-        warehouseArea,
-        warehouseCapacity,
-        warehouseVolume,
-        warehouseRackCount,
-        warehouseGateCount,
-      });
-
+      if (!req.body.companyId) {
+        return res.status(400).json({ message: "Şirket kimliği zorunludur." });
+      }
+      req.body.code = await generateWarehouseCode(req.body.companyId);
+      console.log(req.body);
+      const warehouse = new Warehouse(req.body);
       await warehouse.save();
       res
         .status(201)
